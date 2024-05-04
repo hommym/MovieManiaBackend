@@ -2,6 +2,7 @@ import express from "express"
 import dotenv from "dotenv"
 dotenv.config()
 import { connectToDatabase } from "./libs/mongoose";
+import { authRouter } from "./routes/auth/authRoutes";
 
 
 const app = express();
@@ -14,7 +15,7 @@ app.use(express.json());
 
 
 // routes
-// app.use("/api/auth")
+app.use("/api/auth",authRouter)
 
 
 // error handling middlware
