@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": " node ./build/app.js"
+    "start": " nodemon ./build/app.js"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +17,10 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "axios": "^1.6.7",
+    "bcrypt": "^5.1.1",
+    "mongoose": "^8.0.2",
+    "jsonwebtoken": "^9.0.2"
   }
 }

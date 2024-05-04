@@ -12,26 +12,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
-const mongoose_1 = require("./libs/mongoose");
-const app = (0, express_1.default)();
-// middlewares
-app.use(express_1.default.json());
-// routes
-// app.use("/api/auth")
-// error handling middlware
-const port = process.env.PORT ? process.env.PORT : 8000;
-const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield (0, mongoose_1.connectToDatabase)(process.env.MongoDbConnectionUrl);
-        app.listen(port, () => {
-            console.log(`Server  is listening on ${port} `);
-        });
+exports.tObjectId = exports.connectToDatabase = void 0;
+// importing required modules
+const mongoose_1 = __importDefault(require("mongoose"));
+// const mongoose = require("mongoose");
+mongoose_1.default.connection.once("open", () => {
+    console.log("Database connection successfully established");
+});
+mongoose_1.default.connection.on("error", (e) => {
+    console.log(`An error occurred while connecting ${e.message}`);
+});
+const connectToDatabase = (connectionUrl) => __awaiter(void 0, void 0, void 0, function* () {
+    if (typeof connectionUrl === "string") {
+        yield mongoose_1.default.connect(connectionUrl);
     }
-    catch (error) {
-        console.log(`ServerStartUpError:${error}`);
+    else {
+        console.log("Mongo Db connection url undefined");
     }
 });
-startServer();
+exports.connectToDatabase = connectToDatabase;
+const tObjectId = (id) => {
+    return new mongoose_1.default.Types.ObjectId(id);
+};
+exports.tObjectId = tObjectId;
+// exports = { connectToDatabase, tObjectId };

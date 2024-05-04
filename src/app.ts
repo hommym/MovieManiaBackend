@@ -1,3 +1,42 @@
+import express from "express"
+import dotenv from "dotenv"
+dotenv.config()
+import { connectToDatabase } from "./libs/mongoose";
+
+
+const app = express();
 
 
 
+
+// middlewares
+app.use(express.json());
+
+
+// routes
+// app.use("/api/auth")
+
+
+// error handling middlware
+
+
+
+
+const port = process.env.PORT ? process.env.PORT : 8000;
+const startServer= async()=>{
+
+  try {
+    await connectToDatabase(process.env.MongoDbConnectionUrl);
+
+    app.listen(port, () => {
+      console.log(`Server  is listening on ${port} `);
+    });
+  } catch (error) {
+    console.log(`ServerStartUpError:${error}`)
+  }
+
+
+}
+
+
+startServer()
