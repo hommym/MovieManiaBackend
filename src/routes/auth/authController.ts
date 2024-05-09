@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 // Custom data types
 import { Request, Response, NextFunction } from "express";
 import { User } from "../../helperToools/customDataTypes";
+import { sendConfirmationMessage } from "../../libs/nodemailer";
 
 export const signUpController = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -18,23 +19,20 @@ export const signUpController = async (req: Request, res: Response, next: NextFu
 
     // console.log(userNamesInDatabase,workEmailsInDatabase)
     if (emailsInDatabase.length !== 0) {
-       res.status(409).json({ message: "Account with this email already exist" });
-    }
-    else{
+      res.status(409).json({ message: "Account with this email already exist" });
+    } else {
       // saving data in database
       const savedDocument: User = await UserSchema.create(clientData);
       console.log("account created successfully");
       req.body.user = savedDocument;
 
+      // sending confirmation email
+      await sendConfirmationMessage({ to: req.body.user.email, subject: "MovieMania Account Confirmation Email" }, req.body.user._id);
 
-        // create a method for sending confirmation email(not IMP yet)
-
-
-     res.status(200).json({isAccountCreated:true})
+      res.status(200).json({ isAccountCreated: true });
     }
-
-
   } catch (error) {
+    console.log(error);
     res.status(400);
     next(new Error("The request is missing required fields"));
   }

@@ -10,3 +10,12 @@ export type User = {
   isVerified?: boolean;
   verfCode?: number;
 };
+
+
+export type mailObject={
+  from?:string;
+  to:string;
+  subject:string;
+  text?:string;
+  html?:string;
+}
