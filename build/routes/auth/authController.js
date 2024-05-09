@@ -16,6 +16,7 @@ exports.signUpController = void 0;
 // libs
 const userSchema_1 = require("../../schemas/userSchema");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const nodemailer_1 = require("../../libs/nodemailer");
 const signUpController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const clientData = req.body;
@@ -32,11 +33,13 @@ const signUpController = (req, res, next) => __awaiter(void 0, void 0, void 0, f
             const savedDocument = yield userSchema_1.UserSchema.create(clientData);
             console.log("account created successfully");
             req.body.user = savedDocument;
-            // create a method for sending confirmation email(not IMP yet)
+            // sending confirmation email
+            yield (0, nodemailer_1.sendConfirmationMessage)({ to: req.body.user.email, subject: "MovieMania Account Confirmation Email" }, req.body.user._id);
             res.status(200).json({ isAccountCreated: true });
         }
     }
     catch (error) {
+        console.log(error);
         res.status(400);
         next(new Error("The request is missing required fields"));
     }
