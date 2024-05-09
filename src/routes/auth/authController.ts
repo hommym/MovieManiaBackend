@@ -6,6 +6,8 @@ import bcrypt from "bcrypt";
 import { Request, Response, NextFunction } from "express";
 import { User } from "../../helperToools/customDataTypes";
 import { sendConfirmationMessage } from "../../libs/nodemailer";
+import { tObjectId } from "../../libs/mongoose";
+
 
 export const signUpController = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -37,3 +39,21 @@ export const signUpController = async (req: Request, res: Response, next: NextFu
     next(new Error("The request is missing required fields"));
   }
 };
+
+export const accountConfirmationController = async (req: Request, res: Response, next: NextFunction) => {
+
+
+
+try{
+
+// updating user data
+await UserSchema.updateOne({_id:tObjectId(req.body.id)},{$set:{isVerified:true,verfCode:0}})
+
+res.status(200).json({message:"User Account Confirmed successfully"})
+
+}
+catch(error){
+next(error)
+}
+
+}

@@ -12,11 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signUpController = void 0;
+exports.accountConfirmationController = exports.signUpController = void 0;
 // libs
 const userSchema_1 = require("../../schemas/userSchema");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const nodemailer_1 = require("../../libs/nodemailer");
+const mongoose_1 = require("../../libs/mongoose");
 const signUpController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const clientData = req.body;
@@ -45,3 +46,14 @@ const signUpController = (req, res, next) => __awaiter(void 0, void 0, void 0, f
     }
 });
 exports.signUpController = signUpController;
+const accountConfirmationController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // updating user data
+        yield userSchema_1.UserSchema.updateOne({ _id: (0, mongoose_1.tObjectId)(req.body.id) }, { $set: { isVerified: true, verfCode: 0 } });
+        res.status(200).json({ message: "User Account Confirmed successfully" });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.accountConfirmationController = accountConfirmationController;

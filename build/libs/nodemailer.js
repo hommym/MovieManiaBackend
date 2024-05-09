@@ -33,10 +33,11 @@ const sendConfirmationMessage = (emailData, id) => __awaiter(void 0, void 0, voi
     const randomNumberForVerfCode = Math.floor(Math.random() * 90000) + 10000;
     // setting verfCode
     yield userSchema_1.UserSchema.updateOne({ _id: id }, { $set: { verfCode: randomNumberForVerfCode } });
-    console.log("Verfication for account set..");
+    console.log("Verfication code for account set..");
     //   setting message
-    emailData.text = `Hi thank you for registering for MovieMania Account \n \n To complete the account creation process please click the link below \n \n ${process.env.BaseUrl}/${(0, jwt_1.jwtForSignUp)(String(id), randomNumberForVerfCode)}`;
+    emailData.text = ` Hi thank you for registering for MovieMania Account \n\n To complete the account creation process please click the link below \n \n ${process.env.BaseUrl}/api/auth/account-confirmation/${(0, jwt_1.jwtForSignUp)(String(id), randomNumberForVerfCode)}`;
     // sending mail
     yield transporter.sendMail(emailData);
+    console.log("Confirmation email sent");
 });
 exports.sendConfirmationMessage = sendConfirmationMessage;

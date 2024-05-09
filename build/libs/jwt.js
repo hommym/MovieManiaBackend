@@ -36,7 +36,7 @@ const verifyToken = (token) => {
     }
     catch (error) {
         console.log(error);
-        return null;
+        return error;
     }
 };
 exports.verifyToken = verifyToken;

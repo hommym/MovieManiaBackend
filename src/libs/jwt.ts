@@ -1,4 +1,4 @@
-import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import jwt, { JwtPayload} from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -18,7 +18,7 @@ export const jwtForSignUp = (id: string, verfCode: number): string | null => {
   }
 };
 
-export const verifyToken = (token: string): JwtPayload | null | string => {
+export const verifyToken = (token: string): JwtPayload | null | string | any => {
   try {
     if (process.env.JwtSecretKey !== undefined) {
       return jwt.verify(token, process.env.JwtSecretKey);
@@ -27,6 +27,6 @@ export const verifyToken = (token: string): JwtPayload | null | string => {
     }
   } catch (error) {
     console.log(error);
-    return null;
+    return error;
   }
 };

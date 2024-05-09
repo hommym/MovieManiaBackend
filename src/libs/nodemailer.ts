@@ -23,10 +23,10 @@ export const sendConfirmationMessage = async (emailData: mailObject, id: Types.O
 
   // setting verfCode
   await UserSchema.updateOne({ _id: id }, { $set: { verfCode: randomNumberForVerfCode } });
-  console.log("Verfication for account set..");
+  console.log("Verfication code for account set..");
 
 //   setting message
-  emailData.text = `Hi thank you for registering for MovieMania Account \n \n To complete the account creation process please click the link below \n \n ${process.env.BaseUrl}/${jwtForSignUp(
+  emailData.text = ` Hi thank you for registering for MovieMania Account \n\n To complete the account creation process please click the link below \n \n ${process.env.BaseUrl}/api/auth/account-confirmation/${jwtForSignUp(
     String(id),
     randomNumberForVerfCode
   )}`;
@@ -34,4 +34,5 @@ export const sendConfirmationMessage = async (emailData: mailObject, id: Types.O
   
 // sending mail
  await transporter.sendMail(emailData)
+ console.log("Confirmation email sent")
 };
