@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 // Custom data types
 import { Request, Response, NextFunction } from "express";
 import { User, loginCredentials } from "../../helperToools/customDataTypes";
-import { sendConfirmationMessage } from "../../libs/nodemailer";
+import { sendConfirmationMessage, sendResetPasswordEmail } from "../../libs/nodemailer";
 import { tObjectId } from "../../libs/mongoose";
 import { jwtForLogIn } from "../../libs/jwt";
 
@@ -58,37 +58,60 @@ export const accountConfirmationController = async (req: Request, res: Response,
 };
 
 export const loginController = async (req: Request, res: Response, next: NextFunction) => {
-  console.log("A User is been Authenticated...");
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
+    const { password } = req.body;
+    if (!password) {
       res.status(400);
-      throw new Error("Incomplete body");
+      throw new Error("Bad request invalid request body");
     }
     const logInDetails: loginCredentials = req.body;
-    console.log("Checking if account exist...");
-    // checking if account already existed
-    const accountsInDatabase: Array<User> = await UserSchema.find({ email: logInDetails.email });
-    if (accountsInDatabase.length === 0) {
-      console.log("Account does not exist");
-      res.status(409).json({ message: "Invalid email and password" });
-    } else {
-      console.log("Account exist");
 
-      console.log("Checking if password is correct...");
-      const isPasswordCorrect = await bcrypt.compare(logInDetails.password, accountsInDatabase[0].password);
+    console.log("Checking if password is correct...");
+    const isPasswordCorrect = await bcrypt.compare(logInDetails.password, req.body.hashedPassword);
 
-      if (!isPasswordCorrect) {
-        console.log("Password Invalid");
-        res.status(409);
-        throw new Error("Invalid email and password");
-      }
-      console.log("Password Correct");
-      console.log("User Authorized");
-      // creating jwt for authorized use
-      res.status(200).json({ message: "Login successful", token: jwtForLogIn(String(accountsInDatabase[0]._id)) });
+    if (!isPasswordCorrect) {
+      console.log("Password Invalid");
+      res.status(409);
+      throw new Error("Invalid email and password");
     }
+    console.log("Password Correct");
+    console.log("User Authorized");
+    // creating jwt for authorized use
+    res.status(200).json({ message: "Login successful", token: jwtForLogIn(req.body.id) });
   } catch (error) {
     next(error);
+  }
+};
+
+export const resetPasswordController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // sending account reset email
+    await sendResetPasswordEmail({ to: req.body.email, subject: "MovieMania Password Reset Email" }, req.body.id);
+    res.status(200).json({ message: "Email sent click on the link to reset password" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const passwordResetController = async (req: Request, res: Response, next: NextFunction) => {
+  const { newPassword } = req.body;
+  console.log("A User is about to reset password")
+  try {
+    if (!newPassword) {
+      res.status(400);
+      throw new Error("Bad request invalid request body,newPassword undefined");
+    }
+    // hashing new password
+    console.log("Hashing new passwprd....");
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    console.log("Password hashed");
+    console.log("Updating user password....");
+    await UserSchema.updateOne({ _id: tObjectId(req.body.id) }, { $set: { password: hashedPassword } });
+
+    console.log("User password updated");
+
+    res.status(200).json({message:"User password updated successfully"})
+  } catch (error) {
+    next(error)
   }
 };

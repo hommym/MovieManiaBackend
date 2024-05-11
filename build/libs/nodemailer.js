@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendConfirmationMessage = void 0;
+exports.sendResetPasswordEmail = exports.sendConfirmationMessage = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const userSchema_1 = require("../schemas/userSchema");
@@ -41,3 +41,11 @@ const sendConfirmationMessage = (emailData, id) => __awaiter(void 0, void 0, voi
     console.log("Confirmation email sent");
 });
 exports.sendConfirmationMessage = sendConfirmationMessage;
+const sendResetPasswordEmail = (emailData, id) => __awaiter(void 0, void 0, void 0, function* () {
+    //   setting message
+    emailData.text = ` Hi to reset you MovieMania Account \n\n  please click the link below \n \n ${process.env.BaseUrl}/api/auth/reset-password/${(0, jwt_1.jwtForLogIn)(String(id))}`;
+    // sending mail
+    yield transporter.sendMail(emailData);
+    console.log("Password Reset email sent");
+});
+exports.sendResetPasswordEmail = sendResetPasswordEmail;

@@ -24,6 +24,9 @@ const verifyUserEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         if (accountsInDatabase.length === 0) {
             console.log("No Account with this  email  exist");
             res.status(409);
+            if (!req.body.password) {
+                throw new Error("No account with this email exist");
+            }
             throw new Error("Invalid email and password");
         }
         console.log("An account with user email exist");

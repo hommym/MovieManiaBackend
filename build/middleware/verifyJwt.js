@@ -6,8 +6,9 @@ const verifyJwt = (req, res, next) => {
     let jwtData = null;
     console.log("Jwt verification began....");
     try {
-        if (req.params.verfToken !== undefined) {
-            jwtData = (0, jwt_1.verifyToken)(req.params.verfToken);
+        if (req.params.verfToken || req.params.resetToken) {
+            const token = req.params.verfToken ? req.params.verfToken : req.params.resetToken;
+            jwtData = (0, jwt_1.verifyToken)(token);
             console.log("Jwt token Verified");
             req.body.id = jwtData.userId;
             req.body.verfcode = jwtData.code;

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loginController = exports.accountConfirmationController = exports.signUpController = void 0;
+exports.passwordResetController = exports.resetPasswordController = exports.loginController = exports.accountConfirmationController = exports.signUpController = void 0;
 // libs
 const userSchema_1 = require("../../schemas/userSchema");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -63,38 +63,60 @@ const accountConfirmationController = (req, res, next) => __awaiter(void 0, void
 });
 exports.accountConfirmationController = accountConfirmationController;
 const loginController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("A User is been Authenticated...");
     try {
-        const { email, password } = req.body;
-        if (!email || !password) {
+        const { password } = req.body;
+        if (!password) {
             res.status(400);
-            throw new Error("Incomplete body");
+            throw new Error("Bad request invalid request body");
         }
         const logInDetails = req.body;
-        console.log("Checking if account exist...");
-        // checking if account already existed
-        const accountsInDatabase = yield userSchema_1.UserSchema.find({ email: logInDetails.email });
-        if (accountsInDatabase.length === 0) {
-            console.log("Account does not exist");
-            res.status(409).json({ message: "Invalid email and password" });
+        console.log("Checking if password is correct...");
+        const isPasswordCorrect = yield bcrypt_1.default.compare(logInDetails.password, req.body.hashedPassword);
+        if (!isPasswordCorrect) {
+            console.log("Password Invalid");
+            res.status(409);
+            throw new Error("Invalid email and password");
         }
-        else {
-            console.log("Account exist");
-            console.log("Checking if password is correct...");
-            const isPasswordCorrect = yield bcrypt_1.default.compare(logInDetails.password, accountsInDatabase[0].password);
-            if (!isPasswordCorrect) {
-                console.log("Password Invalid");
-                res.status(409);
-                throw new Error("Invalid email and password");
-            }
-            console.log("Password Correct");
-            console.log("User Authorized");
-            // creating jwt for authorized use
-            res.status(200).json({ message: "Login successful", token: (0, jwt_1.jwtForLogIn)(String(accountsInDatabase[0]._id)) });
-        }
+        console.log("Password Correct");
+        console.log("User Authorized");
+        // creating jwt for authorized use
+        res.status(200).json({ message: "Login successful", token: (0, jwt_1.jwtForLogIn)(req.body.id) });
     }
     catch (error) {
         next(error);
     }
 });
 exports.loginController = loginController;
+const resetPasswordController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // sending account reset email
+        yield (0, nodemailer_1.sendResetPasswordEmail)({ to: req.body.email, subject: "MovieMania Password Reset Email" }, req.body.id);
+        res.status(200).json({ message: "Email sent click on the link to reset password" });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.resetPasswordController = resetPasswordController;
+const passwordResetController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { newPassword } = req.body;
+    console.log("A User is about to reset password");
+    try {
+        if (!newPassword) {
+            res.status(400);
+            throw new Error("Bad request invalid request body,newPassword undefined");
+        }
+        // hashing new password
+        console.log("Hashing new passwprd....");
+        const hashedPassword = yield bcrypt_1.default.hash(newPassword, 10);
+        console.log("Password hashed");
+        console.log("Updating user password....");
+        yield userSchema_1.UserSchema.updateOne({ _id: (0, mongoose_1.tObjectId)(req.body.id) }, { $set: { password: hashedPassword } });
+        console.log("User password updated");
+        res.status(200).json({ message: "User password updated successfully" });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.passwordResetController = passwordResetController;

@@ -16,6 +16,9 @@ export const verifyUserEmail = async (req: Request, res: Response, next: NextFun
     if (accountsInDatabase.length === 0) {
       console.log("No Account with this  email  exist");
       res.status(409);
+      if(!req.body.password){
+        throw new Error("No account with this email exist");
+      }
       throw new Error("Invalid email and password");
     }
 
