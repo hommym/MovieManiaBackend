@@ -93,14 +93,38 @@ export const resetPasswordController = async (req: Request, res: Response, next:
   }
 };
 
-export const passwordResetController = async (req: Request, res: Response, next: NextFunction) => {
-  const { newPassword } = req.body;
-  console.log("A User is about to reset password")
+export const changePasswordController = async (req: Request, res: Response, next: NextFunction) => {
+  const { newPassword, oldPassword } = req.body;
+  console.log("A User is about to reset password");
   try {
     if (!newPassword) {
       res.status(400);
       throw new Error("Bad request invalid request body,newPassword undefined");
     }
+    // checking if there is an oldPassword to compare if is correct with the one in database in request
+    if (req.url === "/change-password") {
+      if (oldPassword) {
+        console.log("Checking if password is correct...");
+        const userData = await UserSchema.findById(req.body.id);
+
+        if (userData !== null) {
+          const isPasswordCorrect = await bcrypt.compare(oldPassword, userData.password);
+
+          if (!isPasswordCorrect) {
+            console.log("Password Invalid");
+            res.status(409);
+            throw new Error("Current password incorrect");
+          }
+
+          console.log("Password correct")
+
+        }
+      } else {
+        res.status(400);
+        throw new Error("Bad request invalid request body,oldPassword undefined");
+      }
+    }
+
     // hashing new password
     console.log("Hashing new passwprd....");
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -110,8 +134,8 @@ export const passwordResetController = async (req: Request, res: Response, next:
 
     console.log("User password updated");
 
-    res.status(200).json({message:"User password updated successfully"})
+    res.status(200).json({ message: "User password updated successfully" });
   } catch (error) {
-    next(error)
+    next(error);
   }
 };

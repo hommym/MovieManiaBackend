@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.passwordResetController = exports.resetPasswordController = exports.loginController = exports.accountConfirmationController = exports.signUpController = void 0;
+exports.changePasswordController = exports.resetPasswordController = exports.loginController = exports.accountConfirmationController = exports.signUpController = void 0;
 // libs
 const userSchema_1 = require("../../schemas/userSchema");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -98,13 +98,33 @@ const resetPasswordController = (req, res, next) => __awaiter(void 0, void 0, vo
     }
 });
 exports.resetPasswordController = resetPasswordController;
-const passwordResetController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { newPassword } = req.body;
+const changePasswordController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { newPassword, oldPassword } = req.body;
     console.log("A User is about to reset password");
     try {
         if (!newPassword) {
             res.status(400);
             throw new Error("Bad request invalid request body,newPassword undefined");
+        }
+        // checking if there is an oldPassword to compare if is correct with the one in database in request
+        if (req.url === "/change-password") {
+            if (oldPassword) {
+                console.log("Checking if password is correct...");
+                const userData = yield userSchema_1.UserSchema.findById(req.body.id);
+                if (userData !== null) {
+                    const isPasswordCorrect = yield bcrypt_1.default.compare(oldPassword, userData.password);
+                    if (!isPasswordCorrect) {
+                        console.log("Password Invalid");
+                        res.status(409);
+                        throw new Error("Current password incorrect");
+                    }
+                    console.log("Password correct");
+                }
+            }
+            else {
+                res.status(400);
+                throw new Error("Bad request invalid request body,oldPassword undefined");
+            }
         }
         // hashing new password
         console.log("Hashing new passwprd....");
@@ -119,4 +139,4 @@ const passwordResetController = (req, res, next) => __awaiter(void 0, void 0, vo
         next(error);
     }
 });
-exports.passwordResetController = passwordResetController;
+exports.changePasswordController = changePasswordController;
