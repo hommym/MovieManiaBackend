@@ -19,3 +19,8 @@ export type mailObject={
   text?:string;
   html?:string;
 }
+
+export type loginCredentials={
+  email:string;
+  password:string;
+}

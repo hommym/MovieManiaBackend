@@ -8,3 +8,4 @@ const verifyJwt_1 = require("../../middleware/verifyJwt");
 exports.authRouter = (0, express_1.Router)();
 exports.authRouter.post("/signup", authController_1.signUpController);
 exports.authRouter.post("/account-confirmation/:verfToken", verifyJwt_1.verifyJwt, authController_1.accountConfirmationController);
+exports.authRouter.post("/login", authController_1.loginController);
