@@ -12,8 +12,8 @@ authRouter.post("/account-confirmation/:verfToken", verifyJwt, accountConfirmati
 
 authRouter.post("/login", verifyUserEmail, loginController);
 
-authRouter.post("/request-action/reset-password", verifyUserEmail, resetPasswordController);
+authRouter.post("/reset-account", verifyUserEmail, resetPasswordController);
 
-authRouter.put("/reset-password/:resetToken", verifyJwt, changePasswordController);
+authRouter.put("/confirm-account-reset/:resetToken", verifyJwt, changePasswordController);
 
 authRouter.put("/change-password",verifyJwt,changePasswordController)

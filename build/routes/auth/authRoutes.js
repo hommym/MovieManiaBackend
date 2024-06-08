@@ -10,6 +10,6 @@ exports.authRouter = (0, express_1.Router)();
 exports.authRouter.post("/signup", authController_1.signUpController);
 exports.authRouter.post("/account-confirmation/:verfToken", verifyJwt_1.verifyJwt, authController_1.accountConfirmationController);
 exports.authRouter.post("/login", verifyUserEmail_1.verifyUserEmail, authController_1.loginController);
-exports.authRouter.post("/request-action/reset-password", verifyUserEmail_1.verifyUserEmail, authController_1.resetPasswordController);
-exports.authRouter.put("/reset-password/:resetToken", verifyJwt_1.verifyJwt, authController_1.changePasswordController);
+exports.authRouter.post("/reset-account", verifyUserEmail_1.verifyUserEmail, authController_1.resetPasswordController);
+exports.authRouter.put("/confirm-account-reset/:resetToken", verifyJwt_1.verifyJwt, authController_1.changePasswordController);
 exports.authRouter.put("/change-password", verifyJwt_1.verifyJwt, authController_1.changePasswordController);
