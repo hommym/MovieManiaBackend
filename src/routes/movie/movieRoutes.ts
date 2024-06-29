@@ -1,5 +1,5 @@
 import {Router} from "express"
-import { urlController } from "./movieController"
+import { popularMoviesController, recentMoviesController, relatedMoviesController, searchMoviesController, trendingMoviesController, urlController } from "./movieController"
 
 
 
@@ -7,21 +7,32 @@ import { urlController } from "./movieController"
 export const movieRouter= Router()
 
 
-// routes related movies
+
 
 // routes for getting movie url
 
 movieRouter.get("/url",urlController)
 
 
-
-// route for getting a movie details
-
-// route for getting recent movies
+// route for getting trending movies
+movieRouter.get("/trending",trendingMoviesController)
 
 // route for getting popular movies
+movieRouter.get("/popular", popularMoviesController);
+
+// route for getting recent movies
+movieRouter.get("/recent", recentMoviesController);
+
+// route for getting a movie details
+movieRouter.get("/details", trendingMoviesController);
+
+
+// routes related movies
+movieRouter.get("/related", relatedMoviesController);
+
 
 // route for searching for movies
+movieRouter.get("/search", searchMoviesController);
 
 
 

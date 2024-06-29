@@ -98,3 +98,14 @@ export const urlController = async (req: Request, res: Response) => {
 };
 
 
+export const trendingMoviesController = async (req: Request, res: Response) => {};
+
+export const popularMoviesController = async (req: Request, res: Response) => {};
+
+export const recentMoviesController = async (req: Request, res: Response) => {};
+
+export const movieDetailsController = async (req: Request, res: Response) => {};
+
+export const relatedMoviesController = async (req: Request, res: Response) => {};
+
+export const searchMoviesController = async (req: Request, res: Response) => {};
