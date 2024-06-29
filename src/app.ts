@@ -4,6 +4,7 @@ dotenv.config()
 import { connectToDatabase } from "./libs/mongoose";
 import { authRouter } from "./routes/auth/authRoutes";
 import { movieRouter } from "./routes/movie/movieRoutes";
+import { errorHandeler } from "./middleware/errorHandler";
 
 const app = express();
 
@@ -19,7 +20,7 @@ app.use("/api/auth",authRouter)
 app.use("/api/movie",movieRouter)
 
 // error handling middlware
-
+app.use(errorHandeler)
 
 
 

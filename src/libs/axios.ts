@@ -1,6 +1,9 @@
+import dotenv from "dotenv"
+dotenv.config()
 import axios, { Axios } from "axios";
 import tough from "tough-cookie";
 import { wrapper } from "axios-cookiejar-support";
+
 
 export class PageGetter {
   private axiosObject: Axios;
@@ -15,6 +18,12 @@ export class PageGetter {
     const response = await this.axiosObject.get(pageUrl);
     return response.data as string;
   };
+}
+
+
+export const  getDataFromTMDB = async  (url:string)=>{
+ const response= await axios({ url: url, headers: { Authorization: `Bearer ${process.env.TmdbApiKey}` }, });
+ return response.data
 }
 
 

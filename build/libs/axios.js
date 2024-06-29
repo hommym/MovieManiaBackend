@@ -12,7 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PageGetter = void 0;
+exports.getDataFromTMDB = exports.PageGetter = void 0;
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const axios_1 = __importDefault(require("axios"));
 const tough_cookie_1 = __importDefault(require("tough-cookie"));
 const axios_cookiejar_support_1 = require("axios-cookiejar-support");
@@ -29,3 +31,8 @@ class PageGetter {
     }
 }
 exports.PageGetter = PageGetter;
+const getDataFromTMDB = (url) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield (0, axios_1.default)({ url: url, headers: { Authorization: `Bearer ${process.env.TmdbApiKey}` }, });
+    return response.data;
+});
+exports.getDataFromTMDB = getDataFromTMDB;

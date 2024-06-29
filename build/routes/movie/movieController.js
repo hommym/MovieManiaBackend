@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.urlController = void 0;
+exports.searchMoviesController = exports.relatedMoviesController = exports.movieDetailsController = exports.recentMoviesController = exports.popularMoviesController = exports.trendingMoviesController = exports.urlController = void 0;
 const axios_1 = require("../../libs/axios");
 const jsdom_1 = require("../../libs/jsdom");
 const urlController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -94,3 +94,35 @@ const urlController = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.urlController = urlController;
+const trendingMoviesController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("Getting trending movies...");
+        const { timeFrame } = req.query;
+        if (timeFrame === "week" || timeFrame === "day") {
+            console.log("Hitting Tmdb server ...");
+            const response = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/trending/movie/${timeFrame}`);
+            console.log(`Data recieved\nToatal number: ${response.total_results}`);
+            console.log("Data sent to client");
+            res.status(200).json({ data: response });
+        }
+        else {
+            console.log("Could not get data (invalid query parameter");
+            res.status(400);
+            throw new Error("No data or Invalid data passed for query parameter timeframe");
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.trendingMoviesController = trendingMoviesController;
+const popularMoviesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
+exports.popularMoviesController = popularMoviesController;
+const recentMoviesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
+exports.recentMoviesController = recentMoviesController;
+const movieDetailsController = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
+exports.movieDetailsController = movieDetailsController;
+const relatedMoviesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
+exports.relatedMoviesController = relatedMoviesController;
+const searchMoviesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
+exports.searchMoviesController = searchMoviesController;

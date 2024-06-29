@@ -1,6 +1,7 @@
-import { Request, Response } from "express";
-import { PageGetter } from "../../libs/axios";
+import { NextFunction, Request, Response } from "express";
+import { PageGetter, getDataFromTMDB } from "../../libs/axios";
 import { getDocumentObject } from "../../libs/jsdom";
+import { BaseResponse } from "../../components/customDataTypesAndInterfaces/tmdbResponses";
 
 export const urlController = async (req: Request, res: Response) => {
   try {
@@ -26,7 +27,7 @@ export const urlController = async (req: Request, res: Response) => {
 
     // creating PageGetter object
 
-    const pageGetter:PageGetter= new PageGetter()
+    const pageGetter: PageGetter = new PageGetter();
 
     // getting the movie page(which is in html form)
     console.log("Getting movie page....");
@@ -60,7 +61,7 @@ export const urlController = async (req: Request, res: Response) => {
     htmlDocumentObject = getDocumentObject(secondPage);
 
     console.log("Searching for divs with class called downloadlinks.....");
-    const downloadPageElement = htmlDocumentObject.querySelector(".moviedesc1")
+    const downloadPageElement = htmlDocumentObject.querySelector(".moviedesc1");
     console.log(downloadPageElement);
     nextPageLink = `https://www.fzmovies.net/${(downloadPageElement?.querySelector("#downloadlink") as HTMLAnchorElement).href}`;
 
@@ -73,18 +74,18 @@ export const urlController = async (req: Request, res: Response) => {
     htmlDocumentObject = getDocumentObject(downloadPage);
     let downloadLink = "";
     console.log("Searching for input tags on the page.....");
-    const inputTags= htmlDocumentObject.querySelector(".moviedesc")?.querySelectorAll("input")
-   
-    if(inputTags){
-       for ( let inputTag of inputTags) {
-      console.log("An input tag found");
-      console.log("Checking if input tag contains download link....");
-      if (inputTag.name === "download1" || inputTag.name === "download2" || inputTag.name === "download3") {
-        console.log("Download link found");
-        downloadLink = inputTag.value;
-        break;
+    const inputTags = htmlDocumentObject.querySelector(".moviedesc")?.querySelectorAll("input");
+
+    if (inputTags) {
+      for (let inputTag of inputTags) {
+        console.log("An input tag found");
+        console.log("Checking if input tag contains download link....");
+        if (inputTag.name === "download1" || inputTag.name === "download2" || inputTag.name === "download3") {
+          console.log("Download link found");
+          downloadLink = inputTag.value;
+          break;
+        }
       }
-    }
     }
 
     res.status(200).json({ downloadLink });
@@ -97,8 +98,27 @@ export const urlController = async (req: Request, res: Response) => {
   }
 };
 
+export const trendingMoviesController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    console.log("Getting trending movies...");
+    const { timeFrame } = req.query;
 
-export const trendingMoviesController = async (req: Request, res: Response) => {};
+    if (timeFrame === "week" || timeFrame === "day") {
+      console.log("Hitting Tmdb server ...");
+      const response: BaseResponse = await getDataFromTMDB(`https://api.themoviedb.org/3/trending/movie/${timeFrame}`);
+
+      console.log(`Data recieved\nToatal number: ${response.total_results}`);
+      console.log("Data sent to client");
+      res.status(200).json({ data: response });
+    } else {
+      console.log("Could not get data (invalid query parameter");
+      res.status(400);
+      throw new Error("No data or Invalid data passed for query parameter timeframe");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const popularMoviesController = async (req: Request, res: Response) => {};
 
