@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 
 // Custom data types
 import { Request, Response, NextFunction } from "express";
-import { User, loginCredentials } from "../../components/customDataTypes";
+import { User, loginCredentials } from "../../components/customDataTypesAndInterfaces/auth&Email";
 import { sendConfirmationMessage, sendResetPasswordEmail } from "../../libs/nodemailer";
 import { tObjectId } from "../../libs/mongoose";
 import { jwtForLogIn } from "../../libs/jwt";

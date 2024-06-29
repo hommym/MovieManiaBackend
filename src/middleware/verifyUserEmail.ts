@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { UserSchema } from "../schemas/userSchema";
-import { User } from "../components/customDataTypes";
+import { User } from "../components/customDataTypesAndInterfaces/auth&Email";
 
 export const verifyUserEmail = async (req: Request, res: Response, next: NextFunction) => {
   console.log("A User is been Authenticated...");

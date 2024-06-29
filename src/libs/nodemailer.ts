@@ -1,6 +1,6 @@
 import nodeMailer from "nodemailer";
 import dotenv from "dotenv";
-import { mailObject } from "../components/customDataTypes";
+import { mailObject } from "../components/customDataTypesAndInterfaces/auth&Email";
 import { Types } from "mongoose";
 import { UserSchema } from "../schemas/userSchema";
 import { jwtForLogIn, jwtForSignUp } from "./jwt";
