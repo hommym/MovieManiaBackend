@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 
 // Custom data types
 import { Request, Response, NextFunction } from "express";
-import { User, loginCredentials } from "../../helperToools/customDataTypes";
+import { User, loginCredentials } from "../../components/customDataTypes";
 import { sendConfirmationMessage, sendResetPasswordEmail } from "../../libs/nodemailer";
 import { tObjectId } from "../../libs/mongoose";
 import { jwtForLogIn } from "../../libs/jwt";
@@ -116,8 +116,7 @@ export const changePasswordController = async (req: Request, res: Response, next
             throw new Error("Current password incorrect");
           }
 
-          console.log("Password correct")
-
+          console.log("Password correct");
         }
       } else {
         res.status(400);

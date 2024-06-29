@@ -1,6 +1,6 @@
 import nodeMailer from "nodemailer";
 import dotenv from "dotenv";
-import { mailObject } from "../helperToools/customDataTypes";
+import { mailObject } from "../components/customDataTypes";
 import { Types } from "mongoose";
 import { UserSchema } from "../schemas/userSchema";
 import { jwtForLogIn, jwtForSignUp } from "./jwt";
@@ -25,26 +25,21 @@ export const sendConfirmationMessage = async (emailData: mailObject, id: Types.O
   await UserSchema.updateOne({ _id: id }, { $set: { verfCode: randomNumberForVerfCode } });
   console.log("Verfication code for account set..");
 
-//   setting message
-  emailData.text = ` Hi thank you for registering for MovieMania Account \n\n To complete the account creation process please click the link below \n \n ${process.env.BaseUrl}/api/auth/account-confirmation/${jwtForSignUp(
-    String(id),
-    randomNumberForVerfCode
-  )}`;
+  //   setting message
+  emailData.text = ` Hi thank you for registering for MovieMania Account \n\n To complete the account creation process please click the link below \n \n ${
+    process.env.BaseUrl
+  }/api/auth/account-confirmation/${jwtForSignUp(String(id), randomNumberForVerfCode)}`;
 
-  
-// sending mail
- await transporter.sendMail(emailData)
- console.log("Confirmation email sent")
+  // sending mail
+  await transporter.sendMail(emailData);
+  console.log("Confirmation email sent");
 };
 
-
-export const sendResetPasswordEmail= async(emailData: mailObject,id:string)=>{
+export const sendResetPasswordEmail = async (emailData: mailObject, id: string) => {
   //   setting message
-  emailData.text = ` Hi to reset you MovieMania Account \n\n  please click the link below \n \n ${
-    process.env.BaseUrl
-  }/api/auth/reset-password/${jwtForLogIn(String(id))}`;
+  emailData.text = ` Hi to reset you MovieMania Account \n\n  please click the link below \n \n ${process.env.BaseUrl}/api/auth/reset-password/${jwtForLogIn(String(id))}`;
 
   // sending mail
   await transporter.sendMail(emailData);
   console.log("Password Reset email sent");
-}
+};
