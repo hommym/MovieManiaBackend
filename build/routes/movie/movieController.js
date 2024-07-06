@@ -116,9 +116,33 @@ const trendingMoviesController = (req, res, next) => __awaiter(void 0, void 0, v
     }
 });
 exports.trendingMoviesController = trendingMoviesController;
-const popularMoviesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
+const popularMoviesController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("Getting popular movies...");
+        console.log("Hitting Tmdb server ...");
+        const response = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/popular`);
+        console.log(`Data recieved\nToatal number: ${response.total_results}`);
+        console.log("Data sent to client");
+        res.status(200).json({ data: response });
+    }
+    catch (error) {
+        next(error);
+    }
+});
 exports.popularMoviesController = popularMoviesController;
-const recentMoviesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
+const recentMoviesController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("Getting recent movies...");
+        console.log("Hitting Tmdb server ...");
+        const response = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/now_playing`);
+        console.log(`Data recieved\nToatal number: ${response.total_results}`);
+        console.log("Data sent to client");
+        res.status(200).json({ data: response });
+    }
+    catch (error) {
+        next(error);
+    }
+});
 exports.recentMoviesController = recentMoviesController;
 const movieDetailsController = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
 exports.movieDetailsController = movieDetailsController;

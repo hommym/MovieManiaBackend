@@ -120,9 +120,34 @@ export const trendingMoviesController = async (req: Request, res: Response, next
   }
 };
 
-export const popularMoviesController = async (req: Request, res: Response) => {};
+export const popularMoviesController = async (req: Request, res: Response,next:NextFunction) => {
+  try {
+    console.log("Getting popular movies...");
+       console.log("Hitting Tmdb server ...");
+       const response: BaseResponse = await getDataFromTMDB(`https://api.themoviedb.org/3/movie/popular`);
 
-export const recentMoviesController = async (req: Request, res: Response) => {};
+       console.log(`Data recieved\nToatal number: ${response.total_results}`);
+       console.log("Data sent to client");
+       res.status(200).json({ data: response });
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const recentMoviesController = async (req: Request, res: Response,next:NextFunction) => {
+try {
+  console.log("Getting recent movies...");
+  console.log("Hitting Tmdb server ...");
+  const response: BaseResponse = await getDataFromTMDB(`https://api.themoviedb.org/3/movie/now_playing`);
+
+  console.log(`Data recieved\nToatal number: ${response.total_results}`);
+  console.log("Data sent to client");
+  res.status(200).json({ data: response });
+} catch (error) {
+  next(error)
+}
+
+};
 
 export const movieDetailsController = async (req: Request, res: Response) => {};
 
