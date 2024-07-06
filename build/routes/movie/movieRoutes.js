@@ -15,3 +15,4 @@ exports.movieRouter.get("/details", verifyJwt_1.verifyJwt, movieController_1.mov
 exports.movieRouter.get("/related", verifyJwt_1.verifyJwt, movieController_1.relatedMoviesController);
 // route for searching for movies
 exports.movieRouter.get("/search", movieController_1.searchMoviesController);
+// route for pagination 

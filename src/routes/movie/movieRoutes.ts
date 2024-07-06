@@ -19,3 +19,6 @@ movieRouter.get("/related", verifyJwt, relatedMoviesController);
 
 // route for searching for movies
 movieRouter.get("/search", searchMoviesController);
+
+
+// route for pagination 
