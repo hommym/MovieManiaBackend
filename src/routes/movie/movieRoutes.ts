@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { popularMoviesController, recentMoviesController, relatedMoviesController, searchMoviesController, trendingMoviesController, urlController } from "./movieController";
+import { movieCategoryController, movieDetailsController, relatedMoviesController, searchMoviesController, urlController } from "./movieController";
 import { verifyJwt } from "../../middleware/verifyJwt";
 
 export const movieRouter = Router();
@@ -8,17 +8,11 @@ export const movieRouter = Router();
 
 movieRouter.get("/url", urlController);
 
-// route for getting trending movies
-movieRouter.get("/trending", verifyJwt, trendingMoviesController);
-
-// route for getting popular movies
-movieRouter.get("/popular", verifyJwt, popularMoviesController);
-
-// route for getting recent movies
-movieRouter.get("/recent", verifyJwt, recentMoviesController);
+// route for getting trending, popular and recent movies
+movieRouter.get("/:category", verifyJwt, movieCategoryController);
 
 // route for getting a movie details
-movieRouter.get("/details", verifyJwt, trendingMoviesController);
+movieRouter.get("/details", verifyJwt, movieDetailsController);
 
 // routes related movies
 movieRouter.get("/related", verifyJwt, relatedMoviesController);

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchMoviesController = exports.relatedMoviesController = exports.movieDetailsController = exports.recentMoviesController = exports.popularMoviesController = exports.trendingMoviesController = exports.urlController = void 0;
+exports.searchMoviesController = exports.relatedMoviesController = exports.movieDetailsController = exports.movieCategoryController = exports.urlController = void 0;
 const axios_1 = require("../../libs/axios");
 const jsdom_1 = require("../../libs/jsdom");
 const urlController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -94,34 +94,30 @@ const urlController = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.urlController = urlController;
-const trendingMoviesController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const movieCategoryController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("Getting trending movies...");
-        const { timeFrame } = req.query;
-        if (timeFrame === "week" || timeFrame === "day") {
+        // checking the category in which the use wants(ie popular,recent,trending)
+        const { category } = req.params;
+        console.log(`Getting ${category} movies...`);
+        let response = undefined;
+        if (category === "trending") {
+            const { timeFrame } = req.query;
             console.log("Hitting Tmdb server ...");
-            const response = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/trending/movie/${timeFrame}`);
-            console.log(`Data recieved\nToatal number: ${response.total_results}`);
-            console.log("Data sent to client");
-            res.status(200).json({ data: response });
+            response = timeFrame ? yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/trending/movie/${timeFrame}`) : yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/trending/movie/day`);
+        }
+        else if (category === "popular") {
+            response = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/popular`);
+        }
+        else if (category === "recent") {
+            response = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/now_playing`);
         }
         else {
-            console.log("Could not get data (invalid query parameter");
-            res.status(400);
-            throw new Error("No data or Invalid data passed for query parameter timeframe");
+            res.status(404);
+            throw Error("Resource not found");
         }
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.trendingMoviesController = trendingMoviesController;
-const popularMoviesController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        console.log("Getting popular movies...");
-        console.log("Hitting Tmdb server ...");
-        const response = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/popular`);
-        console.log(`Data recieved\nToatal number: ${response.total_results}`);
+        if (response) {
+            console.log(`Data recieved\nToatal number: ${response.total_results}`);
+        }
         console.log("Data sent to client");
         res.status(200).json({ data: response });
     }
@@ -129,21 +125,7 @@ const popularMoviesController = (req, res, next) => __awaiter(void 0, void 0, vo
         next(error);
     }
 });
-exports.popularMoviesController = popularMoviesController;
-const recentMoviesController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        console.log("Getting recent movies...");
-        console.log("Hitting Tmdb server ...");
-        const response = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/now_playing`);
-        console.log(`Data recieved\nToatal number: ${response.total_results}`);
-        console.log("Data sent to client");
-        res.status(200).json({ data: response });
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.recentMoviesController = recentMoviesController;
+exports.movieCategoryController = movieCategoryController;
 const movieDetailsController = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
 exports.movieDetailsController = movieDetailsController;
 const relatedMoviesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
