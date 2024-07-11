@@ -126,7 +126,27 @@ const movieCategoryController = (req, res, next) => __awaiter(void 0, void 0, vo
     }
 });
 exports.movieCategoryController = movieCategoryController;
-const movieDetailsController = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
+const movieDetailsController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("A user is getting a movie details");
+        const { movieId } = req.query;
+        console.log("Checking if movie Id is pressent...");
+        if (movieId) {
+            console.log("Movie id present");
+            console.log("Getting a movie details...");
+            const data = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/${movieId}`);
+            console.log(`Details received movie with id ${movieId} has title ${data.title}`);
+            res.status(200).json({ movieDetails: data });
+        }
+        else {
+            res.status(400);
+            throw new Error("No Value passed for the query parameter ");
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+});
 exports.movieDetailsController = movieDetailsController;
 const relatedMoviesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
 exports.relatedMoviesController = relatedMoviesController;

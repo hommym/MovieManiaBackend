@@ -8,8 +8,7 @@ export const movieRouter = Router();
 
 movieRouter.get("/url", urlController);
 
-// route for getting trending, popular and recent movies
-movieRouter.get("/:category", verifyJwt, movieCategoryController);
+
 
 // route for getting a movie details
 movieRouter.get("/details", verifyJwt, movieDetailsController);
@@ -22,3 +21,6 @@ movieRouter.get("/search", searchMoviesController);
 
 
 // route for pagination 
+
+// route for getting trending, popular and recent movies
+movieRouter.get("/:category", verifyJwt, movieCategoryController);
