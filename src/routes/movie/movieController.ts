@@ -103,16 +103,19 @@ export const movieCategoryController = async (req: Request, res: Response, next:
   try {
     // checking the category in which the use wants(ie popular,recent,trending)
     const { category } = req.params;
+    const { page } = req.query;
     console.log(`Getting ${category} movies...`);
     let response: BaseResponse | undefined = undefined;
     if (category === "trending") {
-      const { timeFrame } = req.query;
+      const timeFrame = req.query.timeFrame ? req.query.timeFrame : "day";
       console.log("Hitting Tmdb server ...");
-      response = timeFrame ? await getDataFromTMDB(`https://api.themoviedb.org/3/trending/movie/${timeFrame}`) : await getDataFromTMDB(`https://api.themoviedb.org/3/trending/movie/day`);
+      response = page
+        ? await getDataFromTMDB(`https://api.themoviedb.org/3/trending/movie/${timeFrame}?page=${page}`)
+        : await getDataFromTMDB(`https://api.themoviedb.org/3/trending/movie/${timeFrame}`);
     } else if (category === "popular") {
-      response = await getDataFromTMDB(`https://api.themoviedb.org/3/movie/popular`);
+      response = page ? await getDataFromTMDB(`https://api.themoviedb.org/3/movie/popular?page=${page}`) : await getDataFromTMDB(`https://api.themoviedb.org/3/movie/popular`);
     } else if (category === "recent") {
-      response = await getDataFromTMDB(`https://api.themoviedb.org/3/movie/now_playing`);
+      response = page ? await getDataFromTMDB(`https://api.themoviedb.org/3/movie/now_playing?page=${page}`) : await getDataFromTMDB(`https://api.themoviedb.org/3/movie/now_playing`);
     } else {
       res.status(404);
       throw Error("Resource not found");
@@ -155,6 +158,4 @@ export const movieDetailsController = async (req: Request, res: Response, next: 
   }
 };
 
-export const relatedMoviesController = async (req: Request, res: Response) => {};
 
-export const searchMoviesController = async (req: Request, res: Response) => {};

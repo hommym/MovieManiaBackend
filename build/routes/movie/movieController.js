@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchMoviesController = exports.relatedMoviesController = exports.movieDetailsController = exports.movieCategoryController = exports.urlController = void 0;
+exports.movieDetailsController = exports.movieCategoryController = exports.urlController = void 0;
 const axios_1 = require("../../libs/axios");
 const jsdom_1 = require("../../libs/jsdom");
 const urlController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -98,18 +98,21 @@ const movieCategoryController = (req, res, next) => __awaiter(void 0, void 0, vo
     try {
         // checking the category in which the use wants(ie popular,recent,trending)
         const { category } = req.params;
+        const { page } = req.query;
         console.log(`Getting ${category} movies...`);
         let response = undefined;
         if (category === "trending") {
-            const { timeFrame } = req.query;
+            const timeFrame = req.query.timeFrame ? req.query.timeFrame : "day";
             console.log("Hitting Tmdb server ...");
-            response = timeFrame ? yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/trending/movie/${timeFrame}`) : yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/trending/movie/day`);
+            response = page
+                ? yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/trending/movie/${timeFrame}?page=${page}`)
+                : yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/trending/movie/${timeFrame}`);
         }
         else if (category === "popular") {
-            response = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/popular`);
+            response = page ? yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/popular?page=${page}`) : yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/popular`);
         }
         else if (category === "recent") {
-            response = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/now_playing`);
+            response = page ? yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/now_playing?page=${page}`) : yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/now_playing`);
         }
         else {
             res.status(404);
@@ -151,7 +154,3 @@ const movieDetailsController = (req, res, next) => __awaiter(void 0, void 0, voi
     }
 });
 exports.movieDetailsController = movieDetailsController;
-const relatedMoviesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
-exports.relatedMoviesController = relatedMoviesController;
-const searchMoviesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
-exports.searchMoviesController = searchMoviesController;
