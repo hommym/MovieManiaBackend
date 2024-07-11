@@ -99,8 +99,6 @@ export const urlController = async (req: Request, res: Response) => {
   }
 };
 
-
-
 export const movieCategoryController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // checking the category in which the use wants(ie popular,recent,trending)
@@ -131,29 +129,30 @@ export const movieCategoryController = async (req: Request, res: Response, next:
   }
 };
 
-export const movieDetailsController = async (req: Request, res: Response,next:NextFunction) => {
-try {
-  console.log("A user is getting a movie details");
-  const { movieId } = req.query;
+export const movieDetailsController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    console.log("A user is getting a movie details");
+    const { movieId } = req.query;
 
-  console.log("Checking if movie Id is pressent...");
-  if (movieId) {
-    console.log("Movie id present");
-    console.log("Getting a movie details...");
+    console.log("Checking if movie Id is pressent...");
+    if (movieId) {
+      console.log("Movie id present");
+      console.log("Getting a movie details...");
 
-    const data = await getDataFromTMDB(`https://api.themoviedb.org/3/movie/${movieId}`);
-    console.log(`Details received movie with id ${movieId} has title ${data.title}`);
+      const data = await getDataFromTMDB(`https://api.themoviedb.org/3/movie/${movieId}`);
+      console.log(`Details received movie with id ${movieId} has title ${data.title}`);
 
-    res.status(200).json({movieDetails:data})
+      console.log("Getting a related movies...");
+      data.relatedMovies = await getDataFromTMDB(`https://api.themoviedb.org/3/movie/${movieId}/similar`);
+      console.log(`Related movies recieved,total= ${data.relatedMovies.total_results}`);
+      res.status(200).json({ movieDetails: data });
+    } else {
+      res.status(400);
+      throw new Error("No Value passed for the query parameter ");
+    }
+  } catch (error) {
+    next(error);
   }
-  else{
-    res.status(400)
-    throw new Error("No Value passed for the query parameter ")
-  }
-
-} catch (error) {
-  next(error)
-}
 };
 
 export const relatedMoviesController = async (req: Request, res: Response) => {};

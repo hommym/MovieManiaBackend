@@ -9,8 +9,6 @@ exports.movieRouter = (0, express_1.Router)();
 exports.movieRouter.get("/url", movieController_1.urlController);
 // route for getting a movie details
 exports.movieRouter.get("/details", verifyJwt_1.verifyJwt, movieController_1.movieDetailsController);
-// routes related movies
-exports.movieRouter.get("/related", verifyJwt_1.verifyJwt, movieController_1.relatedMoviesController);
 // route for searching for movies
 exports.movieRouter.get("/search", movieController_1.searchMoviesController);
 // route for pagination 

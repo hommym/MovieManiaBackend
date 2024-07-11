@@ -13,14 +13,13 @@ movieRouter.get("/url", urlController);
 // route for getting a movie details
 movieRouter.get("/details", verifyJwt, movieDetailsController);
 
-// routes related movies
-movieRouter.get("/related", verifyJwt, relatedMoviesController);
 
 // route for searching for movies
 movieRouter.get("/search", searchMoviesController);
 
 
 // route for pagination 
+
 
 // route for getting trending, popular and recent movies
 movieRouter.get("/:category", verifyJwt, movieCategoryController);

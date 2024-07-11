@@ -136,6 +136,9 @@ const movieDetailsController = (req, res, next) => __awaiter(void 0, void 0, voi
             console.log("Getting a movie details...");
             const data = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/${movieId}`);
             console.log(`Details received movie with id ${movieId} has title ${data.title}`);
+            console.log("Getting a related movies...");
+            data.relatedMovies = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/${movieId}/similar`);
+            console.log(`Related movies recieved,total= ${data.relatedMovies.total_results}`);
             res.status(200).json({ movieDetails: data });
         }
         else {
