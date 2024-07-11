@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.searchRouter = void 0;
+const express_1 = require("express");
+const verifyJwt_1 = require("../../middleware/verifyJwt");
+const searchController_1 = require("./searchController");
+exports.searchRouter = (0, express_1.Router)();
+exports.searchRouter.get("/keyword", verifyJwt_1.verifyJwt, searchController_1.keywordSearchController);
+exports.searchRouter.get("/movies", verifyJwt_1.verifyJwt, searchController_1.movieSearchController);
+exports.searchRouter.get("/tv-series", verifyJwt_1.verifyJwt, searchController_1.seriesSearchController);

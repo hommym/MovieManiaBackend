@@ -5,6 +5,7 @@ import { connectToDatabase } from "./libs/mongoose";
 import { authRouter } from "./routes/auth/authRoutes";
 import { movieRouter } from "./routes/movie/movieRoutes";
 import { errorHandeler } from "./middleware/errorHandler";
+import { searchRouter } from "./routes/search/searchRoutes";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 // routes
 app.use("/api/auth",authRouter)
 app.use("/api/movie",movieRouter)
+app.use("/api/search",searchRouter)
 
 // error handling middlware
 app.use(errorHandeler)

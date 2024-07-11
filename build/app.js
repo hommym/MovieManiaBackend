@@ -19,12 +19,14 @@ const mongoose_1 = require("./libs/mongoose");
 const authRoutes_1 = require("./routes/auth/authRoutes");
 const movieRoutes_1 = require("./routes/movie/movieRoutes");
 const errorHandler_1 = require("./middleware/errorHandler");
+const searchRoutes_1 = require("./routes/search/searchRoutes");
 const app = (0, express_1.default)();
 // middlewares
 app.use(express_1.default.json());
 // routes
 app.use("/api/auth", authRoutes_1.authRouter);
 app.use("/api/movie", movieRoutes_1.movieRouter);
+app.use("/api/search", searchRoutes_1.searchRouter);
 // error handling middlware
 app.use(errorHandler_1.errorHandeler);
 const port = process.env.PORT ? process.env.PORT : 8000;
