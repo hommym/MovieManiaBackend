@@ -20,7 +20,7 @@ export const verifyJwt = (req: Request, res: Response, next: NextFunction) => {
 
       jwtData = verifyToken(req.headers.authorization.split(" ")[1]);
       if(!jwtData.userId){
-         res.status(409);
+         res.status(401);
          throw new Error("Invalid jwt");
       }
       console.log("Jwt token Verified");
