@@ -2,7 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { PageGetter, getDataFromTMDB } from "../../libs/axios";
 import { getDocumentObject } from "../../libs/jsdom";
 import { BaseResponse } from "../../components/customDataTypesAndInterfaces/tmdbResponses";
+import asyncHandler from "express-async-handler";
 import { nextTick } from "process";
+import { fetchData, getContentDetails } from "../../components/fetchData";
 
 export const urlController = async (req: Request, res: Response) => {
   try {
@@ -99,63 +101,10 @@ export const urlController = async (req: Request, res: Response) => {
   }
 };
 
-export const movieCategoryController = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    // checking the category in which the use wants(ie popular,recent,trending)
-    const { category } = req.params;
-    const { page } = req.query;
-    console.log(`Getting ${category} movies...`);
-    let response: BaseResponse | undefined = undefined;
-    if (category === "trending") {
-      const timeFrame = req.query.timeFrame ? req.query.timeFrame : "day";
-      console.log("Hitting Tmdb server ...");
-      response = page
-        ? await getDataFromTMDB(`https://api.themoviedb.org/3/trending/movie/${timeFrame}?page=${page}`)
-        : await getDataFromTMDB(`https://api.themoviedb.org/3/trending/movie/${timeFrame}`);
-    } else if (category === "popular") {
-      response = page ? await getDataFromTMDB(`https://api.themoviedb.org/3/movie/popular?page=${page}`) : await getDataFromTMDB(`https://api.themoviedb.org/3/movie/popular`);
-    } else if (category === "recent") {
-      response = page ? await getDataFromTMDB(`https://api.themoviedb.org/3/movie/now_playing?page=${page}`) : await getDataFromTMDB(`https://api.themoviedb.org/3/movie/now_playing`);
-    } else {
-      res.status(404);
-      throw Error("Resource not found");
-    }
-
-    if (response) {
-      console.log(`Data recieved\nToatal number: ${response.total_results}`);
-    }
-
-    console.log("Data sent to client");
-    res.status(200).json({ data: response });
-  } catch (error) {
-    next(error);
-  }
-};
+export const movieCategoryController = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  await fetchData("movie", req, res);
+});
 
 export const movieDetailsController = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    console.log("A user is getting a movie details");
-    const { movieId } = req.query;
-
-    console.log("Checking if movie Id is pressent...");
-    if (movieId) {
-      console.log("Movie id present");
-      console.log("Getting a movie details...");
-
-      const data = await getDataFromTMDB(`https://api.themoviedb.org/3/movie/${movieId}`);
-      console.log(`Details received movie with id ${movieId} has title ${data.title}`);
-
-      console.log("Getting a related movies...");
-      data.relatedMovies = await getDataFromTMDB(`https://api.themoviedb.org/3/movie/${movieId}/similar`);
-      console.log(`Related movies recieved,total= ${data.relatedMovies.total_results}`);
-      res.status(200).json({ movieDetails: data });
-    } else {
-      res.status(400);
-      throw new Error("No Value passed for the query parameter ");
-    }
-  } catch (error) {
-    next(error);
-  }
+  await getContentDetails("movie", req, res);
 };
-
-

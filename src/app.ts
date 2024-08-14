@@ -6,6 +6,7 @@ import { authRouter } from "./routes/auth/authRoutes";
 import { movieRouter } from "./routes/movie/movieRoutes";
 import { errorHandeler } from "./middleware/errorHandler";
 import { searchRouter } from "./routes/search/searchRoutes";
+import { seriesRouter } from "./routes/tvSeries/tvSeriesroutes";
 
 const app = express();
 
@@ -20,7 +21,7 @@ app.use(express.json());
 app.use("/api/auth",authRouter)
 app.use("/api/movie",movieRouter)
 app.use("/api/search",searchRouter)
-
+app.use("/api/series",seriesRouter)
 // error handling middlware
 app.use(errorHandeler)
 

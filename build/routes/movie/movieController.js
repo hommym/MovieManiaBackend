@@ -8,10 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.movieDetailsController = exports.movieCategoryController = exports.urlController = void 0;
 const axios_1 = require("../../libs/axios");
 const jsdom_1 = require("../../libs/jsdom");
+const express_async_handler_1 = __importDefault(require("express-async-handler"));
+const fetchData_1 = require("../../components/fetchData");
 const urlController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c;
     try {
@@ -94,63 +99,10 @@ const urlController = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.urlController = urlController;
-const movieCategoryController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // checking the category in which the use wants(ie popular,recent,trending)
-        const { category } = req.params;
-        const { page } = req.query;
-        console.log(`Getting ${category} movies...`);
-        let response = undefined;
-        if (category === "trending") {
-            const timeFrame = req.query.timeFrame ? req.query.timeFrame : "day";
-            console.log("Hitting Tmdb server ...");
-            response = page
-                ? yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/trending/movie/${timeFrame}?page=${page}`)
-                : yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/trending/movie/${timeFrame}`);
-        }
-        else if (category === "popular") {
-            response = page ? yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/popular?page=${page}`) : yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/popular`);
-        }
-        else if (category === "recent") {
-            response = page ? yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/now_playing?page=${page}`) : yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/now_playing`);
-        }
-        else {
-            res.status(404);
-            throw Error("Resource not found");
-        }
-        if (response) {
-            console.log(`Data recieved\nToatal number: ${response.total_results}`);
-        }
-        console.log("Data sent to client");
-        res.status(200).json({ data: response });
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.movieCategoryController = movieCategoryController;
+exports.movieCategoryController = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, fetchData_1.fetchData)("movie", req, res);
+}));
 const movieDetailsController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        console.log("A user is getting a movie details");
-        const { movieId } = req.query;
-        console.log("Checking if movie Id is pressent...");
-        if (movieId) {
-            console.log("Movie id present");
-            console.log("Getting a movie details...");
-            const data = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/${movieId}`);
-            console.log(`Details received movie with id ${movieId} has title ${data.title}`);
-            console.log("Getting a related movies...");
-            data.relatedMovies = yield (0, axios_1.getDataFromTMDB)(`https://api.themoviedb.org/3/movie/${movieId}/similar`);
-            console.log(`Related movies recieved,total= ${data.relatedMovies.total_results}`);
-            res.status(200).json({ movieDetails: data });
-        }
-        else {
-            res.status(400);
-            throw new Error("No Value passed for the query parameter ");
-        }
-    }
-    catch (error) {
-        next(error);
-    }
+    yield (0, fetchData_1.getContentDetails)("movie", req, res);
 });
 exports.movieDetailsController = movieDetailsController;
