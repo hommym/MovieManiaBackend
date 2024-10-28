@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const mongoose_1 = require("./libs/mongoose");
 const authRoutes_1 = require("./routes/auth/authRoutes");
@@ -24,6 +25,7 @@ const tvSeriesroutes_1 = require("./routes/tvSeries/tvSeriesroutes");
 const app = (0, express_1.default)();
 // middlewares
 app.use(express_1.default.json());
+app.use((0, cors_1.default)({ origin: "*", methods: ["GET", "POST", "PUT", "DELETE"], credentials: true }));
 // routes
 app.use("/api/auth", authRoutes_1.authRouter);
 app.use("/api/movie", movieRoutes_1.movieRouter);

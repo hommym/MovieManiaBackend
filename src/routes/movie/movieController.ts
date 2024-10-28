@@ -12,21 +12,24 @@ export const urlController = async (req: Request, res: Response) => {
       res.status(400);
       throw new Error("No data pass for the query param title");
     }
-    const title: string = req.query.title as string;
-
+    let title: string = req.query.title as string;
+    const originalTitle = title;
+    title = title.replace(":", "");
     // creating url of movie page we will be visiting
+
     console.log("Creating movie page url....");
     let urlOfMoviePage = "https://www.fzmovies.net/movie-";
     const componentsOfTitle: Array<string> = title.split(" ");
 
     for (let partOfTitle of componentsOfTitle) {
       if (componentsOfTitle.length - 1 === componentsOfTitle.indexOf(partOfTitle)) {
-        urlOfMoviePage = urlOfMoviePage + partOfTitle + "--hmp4.htm";
+        urlOfMoviePage = urlOfMoviePage + partOfTitle + "--hmp4.html";
+        break;
       }
 
       urlOfMoviePage = urlOfMoviePage + partOfTitle + "%20";
     }
-    console.log("Url created");
+    console.log("Url created", urlOfMoviePage);
 
     // creating PageGetter object
 
@@ -58,40 +61,44 @@ export const urlController = async (req: Request, res: Response) => {
 
     // moving to nextPage
     console.log("Getting second page....");
-    const secondPage = await pageGetter.getPage(nextPageLink);
-    console.log("Page available");
-    //    getting the document object form html text
-    htmlDocumentObject = getDocumentObject(secondPage);
+    if (nextPageLink !== "") {
+      const secondPage = await pageGetter.getPage(nextPageLink);
+      console.log("Page available");
+      //    getting the document object form html text
+      htmlDocumentObject = getDocumentObject(secondPage);
 
-    console.log("Searching for divs with class called downloadlinks.....");
-    const downloadPageElement = htmlDocumentObject.querySelector(".moviedesc1");
-    console.log(downloadPageElement);
-    nextPageLink = `https://www.fzmovies.net/${(downloadPageElement?.querySelector("#downloadlink") as HTMLAnchorElement).href}`;
+      console.log("Searching for divs with class called downloadlinks.....");
+      const downloadPageElement = htmlDocumentObject.querySelector(".moviedesc1");
+      console.log(downloadPageElement);
+      nextPageLink = `https://www.fzmovies.net/${(downloadPageElement?.querySelector("#downloadlink") as HTMLAnchorElement).href}`;
 
-    // moving to downloadPage
-    console.log("Getting download page....");
-    const downloadPage = await pageGetter.getPage(nextPageLink);
-    console.log("Page available");
+      // moving to downloadPage
+      console.log("Getting download page....");
+      const downloadPage = await pageGetter.getPage(nextPageLink);
+      console.log("Page available");
 
-    //    getting the document object form html text
-    htmlDocumentObject = getDocumentObject(downloadPage);
-    let downloadLink = "";
-    console.log("Searching for input tags on the page.....");
-    const inputTags = htmlDocumentObject.querySelector(".moviedesc")?.querySelectorAll("input");
+      //    getting the document object form html text
+      htmlDocumentObject = getDocumentObject(downloadPage);
+      let downloadLink = "";
+      console.log("Searching for input tags on the page.....");
+      const inputTags = htmlDocumentObject.querySelector(".moviedesc")?.querySelectorAll("input");
 
-    if (inputTags) {
-      for (let inputTag of inputTags) {
-        console.log("An input tag found");
-        console.log("Checking if input tag contains download link....");
-        if (inputTag.name === "download1" || inputTag.name === "download2" || inputTag.name === "download3") {
-          console.log("Download link found");
-          downloadLink = inputTag.value;
-          break;
+      if (inputTags) {
+        for (let inputTag of inputTags) {
+          console.log("An input tag found");
+          console.log("Checking if input tag contains download link....");
+          if (inputTag.name === "download1" || inputTag.name === "download2" || inputTag.name === "download3") {
+            console.log("Download link found");
+            downloadLink = inputTag.value;
+            break;
+          }
         }
       }
-    }
 
-    res.status(200).json({ downloadLink });
+      res.status(200).json({ downloadLink });
+    } else {
+      res.status(404).json({ error: `The movie ${originalTitle} is not yet avialable, please try again later` });
+    }
   } catch (error) {
     console.log(`An error occurred ${error}`);
     if (res.statusCode == 200) {

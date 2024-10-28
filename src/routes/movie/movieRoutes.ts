@@ -9,7 +9,7 @@ export const movieRouter = Router();
 movieRouter.get("/url", urlController);
 
 // route for getting a movie details
-movieRouter.get("/details", verifyJwt, movieDetailsController);
+movieRouter.get("/details", movieDetailsController);
 
 // route for getting trending, popular and recent movies
-movieRouter.get("/:category", verifyJwt, movieCategoryController);
+movieRouter.get("/:category", movieCategoryController);

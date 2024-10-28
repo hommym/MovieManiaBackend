@@ -9,7 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getContentDetails = exports.fetchData = void 0;
+exports.fetchData = fetchData;
+exports.getContentDetails = getContentDetails;
 const axios_1 = require("../libs/axios");
 // this method is for getting content(wheather movies or series ) data base on categories like recent,trending and popular
 function fetchData(contentType, req, res) {
@@ -51,7 +52,6 @@ function fetchData(contentType, req, res) {
         res.status(200).json({ data: response });
     });
 }
-exports.fetchData = fetchData;
 // this method is for getting details about a content(wheather movies or series) using the contentId
 function getContentDetails(contentType, req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -74,4 +74,3 @@ function getContentDetails(contentType, req, res) {
         }
     });
 }
-exports.getContentDetails = getContentDetails;

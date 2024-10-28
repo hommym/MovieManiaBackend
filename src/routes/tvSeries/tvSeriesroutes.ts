@@ -10,7 +10,7 @@ export const seriesRouter = Router();
 seriesRouter.get("/url", urlController);
 
 // route for getting a movie details
-seriesRouter.get("/details", verifyJwt, seriesDetailsController);
+seriesRouter.get("/details", seriesDetailsController);
 
 // route for getting trending, popular and recent movies
-seriesRouter.get("/:category", verifyJwt, seriesCategoryController);
+seriesRouter.get("/:category", seriesCategoryController);
