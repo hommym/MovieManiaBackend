@@ -18,19 +18,14 @@ export const urlController = async (req: Request, res: Response) => {
     // creating url of movie page we will be visiting
 
     console.log("Creating movie page url....");
-    let urlOfMoviePage = "https://www.fzmovies.net/movie-";
+    let urlOfMoviePage = "";
     const componentsOfTitle: Array<string> = title.split(" ");
 
     for (let partOfTitle of componentsOfTitle) {
-      if (componentsOfTitle.length - 1 === componentsOfTitle.indexOf(partOfTitle)) {
-        urlOfMoviePage = urlOfMoviePage + partOfTitle + "--hmp4.html";
-        break;
-      }
-
       urlOfMoviePage = urlOfMoviePage + partOfTitle + "%20";
     }
+    urlOfMoviePage = `https://www.fzmovies.net/movie-${urlOfMoviePage}--hmp4.htm`;
     console.log("Url created", urlOfMoviePage);
-
     // creating PageGetter object
 
     const pageGetter: PageGetter = new PageGetter();
