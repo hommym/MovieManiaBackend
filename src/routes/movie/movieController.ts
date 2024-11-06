@@ -6,6 +6,15 @@ import asyncHandler from "express-async-handler";
 import { nextTick } from "process";
 import { fetchData, getContentDetails } from "../../components/fetchData";
 
+function replaceSpecialCharacters(input: string): string {
+  // Replace '&' with 'and'
+  let result = input.replace(/&/g, "and");
+
+  // Remove accents from letters
+  result = result.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  return result;
+}
 export const urlController = async (req: Request, res: Response) => {
   try {
     if (!req.query.title) {
@@ -14,6 +23,7 @@ export const urlController = async (req: Request, res: Response) => {
     }
     let title: string = req.query.title as string;
     const originalTitle = title;
+    title = replaceSpecialCharacters(title);
     title = title.replace(":", "");
     // creating url of movie page we will be visiting
 

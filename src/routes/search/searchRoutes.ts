@@ -8,5 +8,5 @@ export const searchRouter = Router();
 
 
 searchRouter.get("/keyword",verifyJwt,keywordSearchController)
-searchRouter.get("/movies",verifyJwt,movieSearchController)
+searchRouter.get("/movies",movieSearchController)
 searchRouter.get("/tv-series",verifyJwt,seriesSearchController)

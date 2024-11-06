@@ -17,6 +17,13 @@ const axios_1 = require("../../libs/axios");
 const jsdom_1 = require("../../libs/jsdom");
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const fetchData_1 = require("../../components/fetchData");
+function replaceSpecialCharacters(input) {
+    // Replace '&' with 'and'
+    let result = input.replace(/&/g, "and");
+    // Remove accents from letters
+    result = result.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return result;
+}
 const urlController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c;
     try {
@@ -26,6 +33,7 @@ const urlController = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         }
         let title = req.query.title;
         const originalTitle = title;
+        title = replaceSpecialCharacters(title);
         title = title.replace(":", "");
         // creating url of movie page we will be visiting
         console.log("Creating movie page url....");
