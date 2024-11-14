@@ -8,6 +8,8 @@ import { movieRouter } from "./routes/movie/movieRoutes";
 import { errorHandeler } from "./middleware/errorHandler";
 import { searchRouter } from "./routes/search/searchRoutes";
 import { seriesRouter } from "./routes/tvSeries/tvSeriesroutes";
+import { liveRouter } from "./routes/live/liveRoutes";
+import { setUpAllEventListners } from "./components/events/setUpAllEventsListners";
 
 const app = express();
 
@@ -23,6 +25,7 @@ app.use("/api/auth",authRouter)
 app.use("/api/movie",movieRouter)
 app.use("/api/search",searchRouter)
 app.use("/api/series",seriesRouter)
+app.use("/api/live",liveRouter)
 // error handling middlware
 app.use(errorHandeler)
 
@@ -33,7 +36,7 @@ const startServer= async()=>{
 
   try {
     await connectToDatabase(process.env.MongoDbConnectionUrl);
-
+    setUpAllEventListners()
     app.listen(port, () => {
       console.log(`Server  is listening on ${port} `);
     });

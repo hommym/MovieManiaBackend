@@ -6,6 +6,7 @@ const errorHandeler = (error, req, res, next) => {
     if (req.statusCode === 200) {
         res.status(500);
     }
+    console.log(error);
     res.json({ err: error.message });
 };
 exports.errorHandeler = errorHandeler;

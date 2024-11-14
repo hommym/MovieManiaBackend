@@ -5,5 +5,6 @@ export const errorHandeler = (error:Error,req:Request,res:Response,next:NextFunc
 if(req.statusCode===200){
     res.status(500)
 }
+console.log(error)
 res.json({err:error.message})
 };
