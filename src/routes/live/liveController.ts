@@ -7,17 +7,35 @@ import { join } from "path";
 import { Segment } from "../../components/customDataTypesAndInterfaces/live";
 import { checkPathExists } from "../../components/helperMethods/path";
 import { RandomData } from "../../components/helperMethods/randomData";
+import axios from "axios";
+import ffmpeg from "fluent-ffmpeg";
 
-export const saveLiveDataController = asyncHandler((req: Request, res: Response) => {
-  const { m3u8, segments } = req.body;
+export const beginStreamController = asyncHandler(async (req: Request, res: Response) => {
+  const { videoUrl } = req.body;
+  const path = join(__dirname, `/live.data/playlist.m3u8`);
 
-  if (!m3u8 || !segments) res.status(400).json({ error: "No value passed for m3u8 or segements" });
-
-  event.emit("saveFile", m3u8, join(__dirname, `/live.data/playlist.m3u8`));
-  (segments as Array<Segment>).forEach((segment) => {
-    event.emit("saveFile", segment.content, join(__dirname, `/live.data/${segment.fileName}.ts`));
-  });
-  res.status(204).end();
+  if (!videoUrl) res.status(400).json({ error: "No data passed for videoUrl" });
+  // Start downloading and processing video
+  const response = await axios.get(videoUrl, { responseType: "stream" });
+  console.log("Breaking up data..")
+  ffmpeg(response.data)
+    .outputOptions([
+      "-start_number 0", // Start numbering segments at 0
+      "-hls_time 10", // Each segment is 10 seconds
+      "-hls_list_size 0", // No limit on playlist size (for VOD)
+      `-hls_segment_filename ${join(__dirname, `/live.data`)}/%03d.ts`, // Naming for segment files
+    ])
+    .on("end", () => {
+      console.log("HLS segments and playlist created");
+    })
+    .on("start", (commadline) => {
+      console.log("ffmpeg has started processing the video..");
+      res.status(200).json({ message: "Stream has started" });
+    })
+    .on("error", (err) => {
+      console.error("Error during processing:", err.message);
+    })
+    .save(path);
 });
 
 export const getPlaylistController = asyncHandler(async (req: Request, res: Response) => {

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadController = exports.getFileController = exports.getPlaylistController = exports.saveLiveDataController = void 0;
+exports.uploadController = exports.getFileController = exports.getPlaylistController = exports.beginStreamController = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
@@ -20,16 +20,35 @@ const objects_1 = require("../../components/constants/objects");
 const path_1 = require("path");
 const path_2 = require("../../components/helperMethods/path");
 const randomData_1 = require("../../components/helperMethods/randomData");
-exports.saveLiveDataController = (0, express_async_handler_1.default)((req, res) => {
-    const { m3u8, segments } = req.body;
-    if (!m3u8 || !segments)
-        res.status(400).json({ error: "No value passed for m3u8 or segements" });
-    objects_1.event.emit("saveFile", m3u8, (0, path_1.join)(__dirname, `/live.data/playlist.m3u8`));
-    segments.forEach((segment) => {
-        objects_1.event.emit("saveFile", segment.content, (0, path_1.join)(__dirname, `/live.data/${segment.fileName}.ts`));
-    });
-    res.status(204).end();
-});
+const axios_1 = __importDefault(require("axios"));
+const fluent_ffmpeg_1 = __importDefault(require("fluent-ffmpeg"));
+exports.beginStreamController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { videoUrl } = req.body;
+    const path = (0, path_1.join)(__dirname, `/live.data/playlist.m3u8`);
+    if (!videoUrl)
+        res.status(400).json({ error: "No data passed for videoUrl" });
+    // Start downloading and processing video
+    const response = yield axios_1.default.get(videoUrl, { responseType: "stream" });
+    console.log("Breaking up data..");
+    (0, fluent_ffmpeg_1.default)(response.data)
+        .outputOptions([
+        "-start_number 0", // Start numbering segments at 0
+        "-hls_time 10", // Each segment is 10 seconds
+        "-hls_list_size 0", // No limit on playlist size (for VOD)
+        `-hls_segment_filename ${(0, path_1.join)(__dirname, `/live.data`)}/%03d.ts`, // Naming for segment files
+    ])
+        .on("end", () => {
+        console.log("HLS segments and playlist created");
+    })
+        .on("start", (commadline) => {
+        console.log("ffmpeg has started processing the video..");
+        res.status(200).json({ message: "Stream has started" });
+    })
+        .on("error", (err) => {
+        console.error("Error during processing:", err.message);
+    })
+        .save(path);
+}));
 exports.getPlaylistController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const path = (0, path_1.join)(__dirname, `/live.data/playlist.m3u8`);
     if (yield (0, path_2.checkPathExists)(path)) {
