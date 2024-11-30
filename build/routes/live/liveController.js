@@ -20,28 +20,27 @@ const objects_1 = require("../../components/constants/objects");
 const path_1 = require("path");
 const path_2 = require("../../components/helperMethods/path");
 const randomData_1 = require("../../components/helperMethods/randomData");
-const axios_1 = __importDefault(require("axios"));
 const fluent_ffmpeg_1 = __importDefault(require("fluent-ffmpeg"));
 exports.beginStreamController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { videoUrl } = req.body;
     const path = (0, path_1.join)(__dirname, `/live.data/playlist.m3u8`);
     if (!videoUrl)
         res.status(400).json({ error: "No data passed for videoUrl" });
-    // Start downloading and processing video
-    const response = yield axios_1.default.get(videoUrl, { responseType: "stream" });
     console.log("Breaking up data..");
-    (0, fluent_ffmpeg_1.default)(response.data)
+    (0, fluent_ffmpeg_1.default)(videoUrl)
+        .inputOptions(["-re"])
         .outputOptions([
         "-start_number 0", // Start numbering segments at 0
-        "-hls_time 10", // Each segment is 10 seconds
-        "-hls_list_size 0", // No limit on playlist size (for VOD)
+        "-hls_time 8", // Each segment is 10 seconds
+        "-hls_list_size 5", // No limit on playlist size (for VOD)
         `-hls_segment_filename ${(0, path_1.join)(__dirname, `/live.data`)}/%03d.ts`, // Naming for segment files
+        "-hls_flags delete_segments",
     ])
         .on("end", () => {
         console.log("HLS segments and playlist created");
     })
         .on("start", (commadline) => {
-        console.log("ffmpeg has started processing the video..");
+        console.log(commadline);
         res.status(200).json({ message: "Stream has started" });
     })
         .on("error", (err) => {
@@ -59,7 +58,7 @@ exports.getPlaylistController = (0, express_async_handler_1.default)((req, res) 
     }
     else {
         console.log("Playlist Path does not exist");
-        res.end();
+        res.status(404).end();
     }
 }));
 exports.getFileController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -67,6 +66,7 @@ exports.getFileController = (0, express_async_handler_1.default)((req, res) => _
     console.log(`fileName=${fileName}`);
     const path = (0, path_1.join)(__dirname, `/live.data/${fileName}`);
     if (yield (0, path_2.checkPathExists)(path)) {
+        res.setHeader("Accept-Ranges", "bytes");
         res.sendFile(path, (err) => {
             if (err)
                 console.log(`File Transfer Error:${err}`);
@@ -74,7 +74,7 @@ exports.getFileController = (0, express_async_handler_1.default)((req, res) => _
     }
     else {
         console.log("Playlist Path does not exist");
-        res.end();
+        res.status(404).end();
     }
 }));
 exports.uploadController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

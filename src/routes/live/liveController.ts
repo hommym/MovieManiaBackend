@@ -9,27 +9,41 @@ import { checkPathExists } from "../../components/helperMethods/path";
 import { RandomData } from "../../components/helperMethods/randomData";
 import axios from "axios";
 import ffmpeg from "fluent-ffmpeg";
+import { readdir, unlink } from "fs/promises";
 
 export const beginStreamController = asyncHandler(async (req: Request, res: Response) => {
   const { videoUrl } = req.body;
   const path = join(__dirname, `/live.data/playlist.m3u8`);
 
   if (!videoUrl) res.status(400).json({ error: "No data passed for videoUrl" });
-  // Start downloading and processing video
-  const response = await axios.get(videoUrl, { responseType: "stream" });
-  console.log("Breaking up data..")
-  ffmpeg(response.data)
+  console.log("Breaking up data..");
+  ffmpeg(videoUrl)
+    .inputOptions(["-re"])
     .outputOptions([
       "-start_number 0", // Start numbering segments at 0
-      "-hls_time 10", // Each segment is 10 seconds
-      "-hls_list_size 0", // No limit on playlist size (for VOD)
+      "-hls_time 8", // Each segment is 10 seconds
+      "-hls_list_size 5", // No limit on playlist size (for VOD)
       `-hls_segment_filename ${join(__dirname, `/live.data`)}/%03d.ts`, // Naming for segment files
+      "-hls_flags delete_segments",
     ])
-    .on("end", () => {
+    .on("end", async () => {
       console.log("HLS segments and playlist created");
+      try {
+        const folderPath = join(__dirname, `/live.data`);
+        console.log(folderPath);
+        const files = await readdir(folderPath);
+
+        for (const file of files) {
+          console.log(file);
+          const filePath = join(folderPath, file);
+          await unlink(filePath);
+        }
+      } catch (error) {
+        console.log(error);
+      }
     })
     .on("start", (commadline) => {
-      console.log("ffmpeg has started processing the video..");
+      console.log(commadline);
       res.status(200).json({ message: "Stream has started" });
     })
     .on("error", (err) => {
@@ -46,7 +60,7 @@ export const getPlaylistController = asyncHandler(async (req: Request, res: Resp
     });
   } else {
     console.log("Playlist Path does not exist");
-    res.end();
+    res.status(404).end();
   }
 });
 
@@ -55,12 +69,13 @@ export const getFileController = asyncHandler(async (req: Request, res: Response
   console.log(`fileName=${fileName}`);
   const path = join(__dirname, `/live.data/${fileName}`);
   if (await checkPathExists(path)) {
+    res.setHeader("Accept-Ranges", "bytes");
     res.sendFile(path, (err) => {
       if (err) console.log(`File Transfer Error:${err}`);
     });
   } else {
     console.log("Playlist Path does not exist");
-    res.end();
+    res.status(404).end();
   }
 });
 

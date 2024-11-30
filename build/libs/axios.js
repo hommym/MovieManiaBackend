@@ -18,11 +18,28 @@ dotenv_1.default.config();
 const axios_1 = __importDefault(require("axios"));
 const tough_cookie_1 = __importDefault(require("tough-cookie"));
 const axios_cookiejar_support_1 = require("axios-cookiejar-support");
+const qs_1 = __importDefault(require("qs"));
 class PageGetter {
     constructor() {
         this.getPage = (pageUrl) => __awaiter(this, void 0, void 0, function* () {
             // this fuction gets the page of the url provided and returns it
             const response = yield this.axiosObject.get(pageUrl);
+            return response.data;
+        });
+        this.getPagePostReq = (pageUrl_1, moviename_1, year_1, ...args_1) => __awaiter(this, [pageUrl_1, moviename_1, year_1, ...args_1], void 0, function* (pageUrl, moviename, year, genre = "") {
+            const data = qs_1.default.stringify({
+                year,
+                year2: year,
+                moviename,
+                submit: "submit",
+                category: "Hollywood",
+                genre
+            });
+            const response = yield this.axiosObject.post(pageUrl, data, {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            });
             return response.data;
         });
         // Create a new cookie jar
@@ -32,7 +49,7 @@ class PageGetter {
 }
 exports.PageGetter = PageGetter;
 const getDataFromTMDB = (url) => __awaiter(void 0, void 0, void 0, function* () {
-    const response = yield (0, axios_1.default)({ url: url, headers: { Authorization: `Bearer ${process.env.TmdbApiKey}` }, });
+    const response = yield (0, axios_1.default)({ url: url, headers: { Authorization: `Bearer ${process.env.TmdbApiKey}` } });
     return response.data;
 });
 exports.getDataFromTMDB = getDataFromTMDB;
