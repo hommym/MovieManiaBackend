@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadController = exports.getFileController = exports.getPlaylistController = exports.beginStreamController = void 0;
+exports.stopSteamController = exports.uploadController = exports.getFileController = exports.getPlaylistController = exports.beginStreamController = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
@@ -21,13 +21,15 @@ const path_1 = require("path");
 const path_2 = require("../../components/helperMethods/path");
 const randomData_1 = require("../../components/helperMethods/randomData");
 const fluent_ffmpeg_1 = __importDefault(require("fluent-ffmpeg"));
+const promises_1 = require("fs/promises");
+let streamingProcess;
 exports.beginStreamController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { videoUrl } = req.body;
     const path = (0, path_1.join)(__dirname, `/live.data/playlist.m3u8`);
     if (!videoUrl)
         res.status(400).json({ error: "No data passed for videoUrl" });
     console.log("Breaking up data..");
-    (0, fluent_ffmpeg_1.default)(videoUrl)
+    streamingProcess = (0, fluent_ffmpeg_1.default)(videoUrl)
         .inputOptions(["-re"])
         .outputOptions([
         "-start_number 0", // Start numbering segments at 0
@@ -36,9 +38,20 @@ exports.beginStreamController = (0, express_async_handler_1.default)((req, res) 
         `-hls_segment_filename ${(0, path_1.join)(__dirname, `/live.data`)}/%03d.ts`, // Naming for segment files
         "-hls_flags delete_segments",
     ])
-        .on("end", () => {
-        console.log("HLS segments and playlist created");
-    })
+        .on("end", () => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const folderPath = (0, path_1.join)(__dirname, `/live.data`);
+            const files = yield (0, promises_1.readdir)(folderPath);
+            for (const file of files) {
+                const filePath = (0, path_1.join)(folderPath, file);
+                yield (0, promises_1.unlink)(filePath);
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
+        streamingProcess = undefined;
+    }))
         .on("start", (commadline) => {
         console.log(commadline);
         res.status(200).json({ message: "Stream has started" });
@@ -63,7 +76,7 @@ exports.getPlaylistController = (0, express_async_handler_1.default)((req, res) 
 }));
 exports.getFileController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { fileName } = req.params;
-    console.log(`fileName=${fileName}`);
+    // console.log(`fileName=${fileName}`);
     const path = (0, path_1.join)(__dirname, `/live.data/${fileName}`);
     if (yield (0, path_2.checkPathExists)(path)) {
         res.setHeader("Accept-Ranges", "bytes");
@@ -73,7 +86,7 @@ exports.getFileController = (0, express_async_handler_1.default)((req, res) => _
         });
     }
     else {
-        console.log("Playlist Path does not exist");
+        // console.log("Playlist Path does not exist");
         res.status(404).end();
     }
 }));
@@ -100,5 +113,27 @@ exports.uploadController = (0, express_async_handler_1.default)((req, res) => __
         }
         objects_1.event.emit("saveFile", file.buffer, path);
         res.status(200).json({ urlVideo: `${process.env.BaseUrl}/api/live/file/${fileName}${videoMimeTypeMap[file.mimetype]}` });
+    }
+}));
+exports.stopSteamController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Stopping Streaming");
+    if (streamingProcess) {
+        try {
+            streamingProcess.kill("SIGINT");
+            const folderPath = (0, path_1.join)(__dirname, `/live.data`);
+            const files = yield (0, promises_1.readdir)(folderPath);
+            for (const file of files) {
+                const filePath = (0, path_1.join)(folderPath, file);
+                yield (0, promises_1.unlink)(filePath);
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
+        streamingProcess = undefined;
+        res.status(200).json({ message: "Stream Has been stopped" });
+    }
+    else {
+        res.status(404).json({ message: "No Stream Avialable" });
     }
 }));

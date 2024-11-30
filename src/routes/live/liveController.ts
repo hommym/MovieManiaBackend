@@ -11,13 +11,15 @@ import axios from "axios";
 import ffmpeg from "fluent-ffmpeg";
 import { readdir, unlink } from "fs/promises";
 
+let streamingProcess: any;
+
 export const beginStreamController = asyncHandler(async (req: Request, res: Response) => {
   const { videoUrl } = req.body;
   const path = join(__dirname, `/live.data/playlist.m3u8`);
 
   if (!videoUrl) res.status(400).json({ error: "No data passed for videoUrl" });
   console.log("Breaking up data..");
-  ffmpeg(videoUrl)
+  streamingProcess = ffmpeg(videoUrl)
     .inputOptions(["-re"])
     .outputOptions([
       "-start_number 0", // Start numbering segments at 0
@@ -27,20 +29,18 @@ export const beginStreamController = asyncHandler(async (req: Request, res: Resp
       "-hls_flags delete_segments",
     ])
     .on("end", async () => {
-      console.log("HLS segments and playlist created");
       try {
         const folderPath = join(__dirname, `/live.data`);
-        console.log(folderPath);
         const files = await readdir(folderPath);
 
         for (const file of files) {
-          console.log(file);
           const filePath = join(folderPath, file);
           await unlink(filePath);
         }
       } catch (error) {
         console.log(error);
       }
+      streamingProcess = undefined;
     })
     .on("start", (commadline) => {
       console.log(commadline);
@@ -66,7 +66,7 @@ export const getPlaylistController = asyncHandler(async (req: Request, res: Resp
 
 export const getFileController = asyncHandler(async (req: Request, res: Response) => {
   const { fileName } = req.params;
-  console.log(`fileName=${fileName}`);
+  // console.log(`fileName=${fileName}`);
   const path = join(__dirname, `/live.data/${fileName}`);
   if (await checkPathExists(path)) {
     res.setHeader("Accept-Ranges", "bytes");
@@ -74,7 +74,7 @@ export const getFileController = asyncHandler(async (req: Request, res: Response
       if (err) console.log(`File Transfer Error:${err}`);
     });
   } else {
-    console.log("Playlist Path does not exist");
+    // console.log("Playlist Path does not exist");
     res.status(404).end();
   }
 });
@@ -101,5 +101,27 @@ export const uploadController = asyncHandler(async (req: Request, res: Response)
     }
     event.emit("saveFile", file!.buffer, path);
     res.status(200).json({ urlVideo: `${process.env.BaseUrl}/api/live/file/${fileName}${videoMimeTypeMap[file!.mimetype]}` });
+  }
+});
+
+export const stopSteamController = asyncHandler(async (req: Request, res: Response) => {
+  console.log("Stopping Streaming");
+  if (streamingProcess) {
+    try {
+      streamingProcess.kill("SIGINT");
+      const folderPath = join(__dirname, `/live.data`);
+      const files = await readdir(folderPath);
+
+      for (const file of files) {
+        const filePath = join(folderPath, file);
+        await unlink(filePath);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    streamingProcess = undefined;
+    res.status(200).json({ message: "Stream Has been stopped" });
+  } else {
+    res.status(404).json({ message: "No Stream Avialable" });
   }
 });

@@ -57,28 +57,28 @@ const getDownloadLink = (secondPagelink) => __awaiter(void 0, void 0, void 0, fu
     var _a;
     let nextPageLink = secondPagelink;
     const secondPage = yield pageGetter.getPage(nextPageLink);
-    console.log("Page available");
+    // console.log("Page available");
     //    getting the document object form html text
     let htmlDocumentObject = (0, jsdom_1.getDocumentObject)(secondPage);
-    console.log("Searching for divs with class called downloadlinks.....");
+    // console.log("Searching for divs with class called downloadlinks.....");
     const downloadPageElement = htmlDocumentObject.querySelector(".moviedesc1");
-    console.log(downloadPageElement);
+    // console.log(downloadPageElement);
     nextPageLink = `https://www.fzmovies.net/${(downloadPageElement === null || downloadPageElement === void 0 ? void 0 : downloadPageElement.querySelector("#downloadlink")).href}`;
     // moving to downloadPage
-    console.log("Getting download page....");
+    // console.log("Getting download page....");
     const downloadPage = yield pageGetter.getPage(nextPageLink);
-    console.log("Page available");
+    // console.log("Page available");
     //    getting the document object form html text
     htmlDocumentObject = (0, jsdom_1.getDocumentObject)(downloadPage);
     let downloadLink = "";
-    console.log("Searching for input tags on the page.....");
+    // console.log("Searching for input tags on the page.....");
     const inputTags = (_a = htmlDocumentObject.querySelector(".moviedesc")) === null || _a === void 0 ? void 0 : _a.querySelectorAll("input");
     if (inputTags) {
         for (let inputTag of inputTags) {
-            console.log("An input tag found");
-            console.log("Checking if input tag contains download link....");
+            // console.log("An input tag found");
+            // console.log("Checking if input tag contains download link....");
             if (inputTag.name === "download1" || inputTag.name === "download2" || inputTag.name === "download3") {
-                console.log("Download link found");
+                // console.log("Download link found");
                 downloadLink = inputTag.value;
                 break;
             }
@@ -90,19 +90,19 @@ const getSecondPagelink = (moviePageLink) => __awaiter(void 0, void 0, void 0, f
     var _a, _b;
     console.log("Getting movie page....");
     const moviePage = yield pageGetter.getPage(moviePageLink);
-    console.log("Page available");
+    // console.log("Page available");
     //    getting the document object form html text
     let htmlDocumentObject = (0, jsdom_1.getDocumentObject)(moviePage);
     // looking for a tag that contains the link to next page
     let nextPageLink = "";
-    console.log("Searching for divs with class called moviesfiles.....");
+    // console.log("Searching for divs with class called moviesfiles.....");
     for (let divElement of htmlDocumentObject.querySelectorAll(".moviesfiles")) {
-        console.log("A div has been found");
-        console.log("Searching for link to next page...");
+        // console.log("A div has been found");
+        // console.log("Searching for link to next page...");
         const linkTag = (_b = (_a = divElement.querySelector("li")) === null || _a === void 0 ? void 0 : _a.querySelector("a")) === null || _b === void 0 ? void 0 : _b.href;
         if (linkTag) {
             nextPageLink = `https://www.fzmovies.net/${linkTag}`;
-            console.log(`The link found = https://www.fzmovies.net/${linkTag}`);
+            // console.log(`The link found = https://www.fzmovies.net/${linkTag}`);
         }
         // the break statement below is just temporary
         break;
@@ -113,15 +113,15 @@ const searchMovie = (title_1, year_1, ...args_1) => __awaiter(void 0, [title_1, 
     var _a, _b, _c, _d, _e, _f, _g, _h;
     let urlNextPage = "";
     console.log("Getting search page....");
-    console.log("Title= ", title);
+    // console.log("Title= ", title);
     const moviePage = yield pageGetter.getPagePostReq("https://www.fzmovies.net/advancedsearch.php", title, year, genre);
-    console.log("Page available");
+    // console.log("Page available");
     //    getting the document object form html text
     let htmlDocumentObject = (0, jsdom_1.getDocumentObject)(moviePage);
-    console.log("Searching for divs with class called mainbox.....");
+    // console.log("Searching for divs with class called mainbox.....");
     for (let divElement of htmlDocumentObject.querySelectorAll(".mainbox")) {
-        console.log("A div has been found");
-        console.log("Searching for link to next page...");
+        // console.log("A div has been found");
+        // console.log("Searching for link to next page...");
         const titleOnSite = (_h = (_g = (_f = (_e = (_d = (_c = (_b = (_a = divElement
             .querySelector("table")) === null || _a === void 0 ? void 0 : _a.querySelector("tbody")) === null || _b === void 0 ? void 0 : _b.querySelector("tr")) === null || _c === void 0 ? void 0 : _c.querySelectorAll("td")[1]) === null || _d === void 0 ? void 0 : _d.querySelector("span")) === null || _e === void 0 ? void 0 : _e.querySelector("a")) === null || _f === void 0 ? void 0 : _f.querySelector("small")) === null || _g === void 0 ? void 0 : _g.querySelector("b")) === null || _h === void 0 ? void 0 : _h.textContent;
         if (areWordsInOrder(title, titleOnSite)) {
@@ -140,7 +140,7 @@ const urlController = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         }
         // perform a search
         let urlOfMoviePage = yield searchMovie(title.replace(/[^\w\s]/g, ""), year, genre);
-        console.log(urlOfMoviePage);
+        // console.log(urlOfMoviePage);
         if (urlOfMoviePage === "") {
             urlOfMoviePage = `https://www.fzmovies.net/movie-${replaceSpecialCharacters(title.replace(/[^\w\s]/g, ""))}--hmp4.htm`;
             const nextPageLink = yield getSecondPagelink(urlOfMoviePage);
@@ -152,27 +152,6 @@ const urlController = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         }
         const downloadLink = yield getDownloadLink(yield getSecondPagelink(urlOfMoviePage));
         res.status(200).json({ downloadLink });
-        // let title: string = req.query.title as string;
-        // const originalTitle = title;
-        // title = replaceSpecialCharacters(originalTitle);
-        // // title = title.replace(":", "");
-        // // creating url of movie page we will be visiting
-        // console.log("Creating movie page url....");
-        // let urlOfMoviePage = "";
-        // const componentsOfTitle: Array<string> = title.split(" ");
-        // for (let partOfTitle of componentsOfTitle) {
-        //   urlOfMoviePage = urlOfMoviePage + partOfTitle + "%20";
-        // }
-        // urlOfMoviePage = `https://www.fzmovies.net/movie-${urlOfMoviePage}--hmp4.htm`;
-        // console.log("Url created", urlOfMoviePage);
-        // const nextPageLink: string = await getSecondPagelink(urlOfMoviePage);
-        // // moving to nextPage
-        // console.log("Getting second page....");
-        // if (nextPageLink !== "") {
-        //   const downloadLink = await getDownloadLink(nextPageLink);
-        //   res.status(200).json({ downloadLink });
-        // } else {
-        // }
     }
     catch (error) {
         console.log(`An error occurred ${error}`);

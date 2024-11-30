@@ -37,11 +37,11 @@ const promises_1 = __importStar(require("fs/promises"));
 const checkPathExists = (path) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield (0, promises_1.access)(path, promises_1.default.constants.F_OK);
-        console.log("Path exists.");
+        // console.log("Path exists.");
         return true;
     }
     catch (err) {
-        console.log("Path does not exist.");
+        // console.log("Path does not exist.");
         return false;
     }
 });
