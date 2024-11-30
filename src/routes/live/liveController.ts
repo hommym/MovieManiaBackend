@@ -46,8 +46,15 @@ export const beginStreamController = asyncHandler(async (req: Request, res: Resp
       console.log(commadline);
       res.status(200).json({ message: "Stream has started" });
     })
-    .on("error", (err) => {
+    .on("error", async (err) => {
       console.error("Error during processing:", err.message);
+              const folderPath = join(__dirname, `/live.data`);
+              const files = await readdir(folderPath);
+               console.log("Deleting files in error handler");
+              for (const file of files) {
+                const filePath = join(folderPath, file);
+                await unlink(filePath);
+              }
     })
     .save(path);
 });
@@ -111,7 +118,7 @@ export const stopSteamController = asyncHandler(async (req: Request, res: Respon
       streamingProcess.kill("SIGINT");
       const folderPath = join(__dirname, `/live.data`);
       const files = await readdir(folderPath);
-
+       console.log("Deleting Files in stopController");
       for (const file of files) {
         const filePath = join(folderPath, file);
         await unlink(filePath);

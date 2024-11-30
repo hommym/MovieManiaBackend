@@ -56,9 +56,16 @@ exports.beginStreamController = (0, express_async_handler_1.default)((req, res) 
         console.log(commadline);
         res.status(200).json({ message: "Stream has started" });
     })
-        .on("error", (err) => {
+        .on("error", (err) => __awaiter(void 0, void 0, void 0, function* () {
         console.error("Error during processing:", err.message);
-    })
+        const folderPath = (0, path_1.join)(__dirname, `/live.data`);
+        const files = yield (0, promises_1.readdir)(folderPath);
+        console.log("Deleting files in error handler");
+        for (const file of files) {
+            const filePath = (0, path_1.join)(folderPath, file);
+            yield (0, promises_1.unlink)(filePath);
+        }
+    }))
         .save(path);
 }));
 exports.getPlaylistController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -122,6 +129,7 @@ exports.stopSteamController = (0, express_async_handler_1.default)((req, res) =>
             streamingProcess.kill("SIGINT");
             const folderPath = (0, path_1.join)(__dirname, `/live.data`);
             const files = yield (0, promises_1.readdir)(folderPath);
+            console.log("Deleting Files in stopController");
             for (const file of files) {
                 const filePath = (0, path_1.join)(folderPath, file);
                 yield (0, promises_1.unlink)(filePath);
