@@ -34,6 +34,11 @@ app.use("/api/movie", movieRoutes_1.movieRouter);
 app.use("/api/search", searchRoutes_1.searchRouter);
 app.use("/api/series", tvSeriesroutes_1.seriesRouter);
 app.use("/api/live", liveRoutes_1.liveRouter);
+// const frontendPath = join(__dirname, "..", "/public"); // Replace 'frontend' with your folder name
+// app.use(express.static(frontendPath));
+// app.get("*", (req, res) => {
+//   res.sendFile(join(frontendPath, "index.html"));
+// });
 // error handling middlware
 app.use(errorHandler_1.errorHandeler);
 const port = process.env.PORT ? process.env.PORT : 8000;

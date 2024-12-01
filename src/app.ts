@@ -10,10 +10,9 @@ import { searchRouter } from "./routes/search/searchRoutes";
 import { seriesRouter } from "./routes/tvSeries/tvSeriesroutes";
 import { liveRouter } from "./routes/live/liveRoutes";
 import { setUpAllEventListners } from "./components/events/setUpAllEventsListners";
+import { join } from "path";
 
 const app = express();
-
-
 
 
 // middlewares
@@ -26,6 +25,13 @@ app.use("/api/movie",movieRouter)
 app.use("/api/search",searchRouter)
 app.use("/api/series",seriesRouter)
 app.use("/api/live",liveRouter)
+
+// const frontendPath = join(__dirname, "..", "/public"); // Replace 'frontend' with your folder name
+// app.use(express.static(frontendPath));
+
+// app.get("*", (req, res) => {
+//   res.sendFile(join(frontendPath, "index.html"));
+// });
 // error handling middlware
 app.use(errorHandeler)
 

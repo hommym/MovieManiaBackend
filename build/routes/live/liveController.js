@@ -24,6 +24,10 @@ const fluent_ffmpeg_1 = __importDefault(require("fluent-ffmpeg"));
 const promises_1 = require("fs/promises");
 let streamingProcess;
 exports.beginStreamController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (streamingProcess) {
+        res.status(409).json({ message: "A Video is already been streamed" });
+        return;
+    }
     const { videoUrl } = req.body;
     const path = (0, path_1.join)(__dirname, `/live.data/playlist.m3u8`);
     if (!videoUrl)
@@ -65,6 +69,7 @@ exports.beginStreamController = (0, express_async_handler_1.default)((req, res) 
             const filePath = (0, path_1.join)(folderPath, file);
             yield (0, promises_1.unlink)(filePath);
         }
+        streamingProcess = undefined;
     }))
         .save(path);
 }));

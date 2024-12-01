@@ -14,6 +14,10 @@ import { readdir, unlink } from "fs/promises";
 let streamingProcess: any;
 
 export const beginStreamController = asyncHandler(async (req: Request, res: Response) => {
+  if (streamingProcess) {
+     res.status(409).json({ message: "A Video is already been streamed" });
+     return;
+  }
   const { videoUrl } = req.body;
   const path = join(__dirname, `/live.data/playlist.m3u8`);
 
@@ -48,13 +52,14 @@ export const beginStreamController = asyncHandler(async (req: Request, res: Resp
     })
     .on("error", async (err) => {
       console.error("Error during processing:", err.message);
-              const folderPath = join(__dirname, `/live.data`);
-              const files = await readdir(folderPath);
-               console.log("Deleting files in error handler");
-              for (const file of files) {
-                const filePath = join(folderPath, file);
-                await unlink(filePath);
-              }
+      const folderPath = join(__dirname, `/live.data`);
+      const files = await readdir(folderPath);
+      console.log("Deleting files in error handler");
+      for (const file of files) {
+        const filePath = join(folderPath, file);
+        await unlink(filePath);
+      }
+      streamingProcess = undefined;
     })
     .save(path);
 });
@@ -118,7 +123,7 @@ export const stopSteamController = asyncHandler(async (req: Request, res: Respon
       streamingProcess.kill("SIGINT");
       const folderPath = join(__dirname, `/live.data`);
       const files = await readdir(folderPath);
-       console.log("Deleting Files in stopController");
+      console.log("Deleting Files in stopController");
       for (const file of files) {
         const filePath = join(folderPath, file);
         await unlink(filePath);
