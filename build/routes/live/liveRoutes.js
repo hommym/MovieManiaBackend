@@ -9,4 +9,7 @@ exports.liveRouter.post("/schedule", liveController_1.beginStreamController);
 exports.liveRouter.post("/stop", liveController_1.stopSteamController);
 exports.liveRouter.post("/upload", (0, multer_1.getFileFromRequest)("newUpload"), liveController_1.uploadController);
 exports.liveRouter.get("/playlist", liveController_1.getPlaylistController);
+exports.liveRouter.post("/playlist", liveController_1.addToPlaylistController);
+exports.liveRouter.delete("/playlist/:title", liveController_1.deletePlaylistController);
 exports.liveRouter.get("/file/:fileName", liveController_1.getFileController);
+exports.liveRouter.get("/uploads/:fileName", liveController_1.getUploadedFilesController);

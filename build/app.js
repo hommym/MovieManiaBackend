@@ -24,6 +24,7 @@ const searchRoutes_1 = require("./routes/search/searchRoutes");
 const tvSeriesroutes_1 = require("./routes/tvSeries/tvSeriesroutes");
 const liveRoutes_1 = require("./routes/live/liveRoutes");
 const setUpAllEventsListners_1 = require("./components/events/setUpAllEventsListners");
+const liveSchema_1 = require("./schemas/liveSchema");
 const app = (0, express_1.default)();
 // middlewares
 app.use(express_1.default.json());
@@ -46,6 +47,7 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield (0, mongoose_1.connectToDatabase)(process.env.MongoDbConnectionUrl);
         (0, setUpAllEventsListners_1.setUpAllEventListners)();
+        yield liveSchema_1.LiveSchema.deleteMany({});
         app.listen(port, () => {
             console.log(`Server  is listening on ${port} `);
         });
