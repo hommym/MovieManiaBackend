@@ -91,10 +91,10 @@ exports.ScheduleLiveListener = ScheduleLiveListener;
 const stopLive = (res) => __awaiter(void 0, void 0, void 0, function* () {
     if (yield (0, path_1.checkPathExists)(path)) {
         try {
+            yield liveSchema_1.LiveSchema.deleteOne({});
             streamingProcess.kill("SIGINT");
             yield delay(10000);
             yield deleteStreamFile();
-            yield liveSchema_1.LiveSchema.deleteMany({});
         }
         catch (error) {
             console.log(error);

@@ -20,7 +20,6 @@ const objects_1 = require("../../components/constants/objects");
 const path_1 = require("path");
 const path_2 = require("../../components/helperMethods/path");
 const randomData_1 = require("../../components/helperMethods/randomData");
-const live_1 = require("../../components/events/live");
 const liveSchema_1 = require("../../schemas/liveSchema");
 exports.beginStreamController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const playListData = yield liveSchema_1.LiveSchema.find({});
@@ -30,49 +29,9 @@ exports.beginStreamController = (0, express_async_handler_1.default)((req, res) 
     }
     else if (playListData.length === 0)
         res.status(404).json({ message: "No Item in playlist to start stream" });
-    objects_1.event.emit("scheduleLive", playListData[0]);
+    const { url, _id } = playListData[0];
+    objects_1.liveStream.initialise(url, _id).setupStreamListners().startStream();
     res.status(200).json({ message: "Stream has started" });
-    // const { videoUrl } = req.body;
-    // const path = join(__dirname, `/live.data/playlist.m3u8`);
-    // if (!videoUrl) res.status(400).json({ error: "No data passed for videoUrl" });
-    // console.log("Breaking up data..");
-    // streamingProcess = ffmpeg(videoUrl)
-    //   .inputOptions(["-re"])
-    //   .outputOptions([
-    //     "-start_number 0", // Start numbering segments at 0
-    //     "-hls_time 8", // Each segment is 10 seconds
-    //     "-hls_list_size 5", // No limit on playlist size (for VOD)
-    //     `-hls_segment_filename ${join(__dirname, `/live.data`)}/%03d.ts`, // Naming for segment files
-    //     "-hls_flags delete_segments",
-    //   ])
-    //   .on("end", async () => {
-    //     try {
-    //       const folderPath = join(__dirname, `/live.data`);
-    //       const files = await readdir(folderPath);
-    //       for (const file of files) {
-    //         const filePath = join(folderPath, file);
-    //         await unlink(filePath);
-    //       }
-    //     } catch (error) {
-    //       console.log(error);
-    //     }
-    //     streamingProcess = undefined;
-    //   })
-    //   .on("start", (commadline) => {
-    //     console.log(commadline);
-    //   })
-    //   .on("error", async (err) => {
-    //     console.error("Error during processing:", err.message);
-    //     const folderPath = join(__dirname, `/live.data`);
-    //     const files = await readdir(folderPath);
-    //     console.log("Deleting files in error handler");
-    //     for (const file of files) {
-    //       const filePath = join(folderPath, file);
-    //       await unlink(filePath);
-    //     }
-    //     streamingProcess = undefined;
-    //   })
-    //   .save(path);
 }));
 exports.addToPlaylistController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.body) {
@@ -149,5 +108,9 @@ exports.uploadController = (0, express_async_handler_1.default)((req, res) => __
 }));
 exports.stopSteamController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Stopping Streaming");
-    yield (0, live_1.stopLive)(res);
+    if (yield objects_1.liveStream.stopStream())
+        res.status(200).json({ message: "Stream Stopped" });
+    else {
+        res.status(404).json({ message: "No Stream Avialable to Stop" });
+    }
 }));

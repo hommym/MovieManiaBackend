@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import asyncHandler from "express-async-handler";
 import { Request, Response, NextFunction } from "express";
-import { event } from "../../components/constants/objects";
+import { event, liveStream } from "../../components/constants/objects";
 import { join } from "path";
 import { Segment } from "../../components/customDataTypesAndInterfaces/live";
 import { checkPathExists } from "../../components/helperMethods/path";
@@ -10,7 +10,6 @@ import { RandomData } from "../../components/helperMethods/randomData";
 import axios from "axios";
 import ffmpeg from "fluent-ffmpeg";
 import { readdir, unlink } from "fs/promises";
-import { stopLive } from "../../components/events/live";
 import { LiveSchema } from "../../schemas/liveSchema";
 
 export const beginStreamController = asyncHandler(async (req: Request, res: Response) => {
@@ -19,51 +18,9 @@ export const beginStreamController = asyncHandler(async (req: Request, res: Resp
     res.status(409).json({ message: "A Video is Already been streamed" });
     return;
   } else if (playListData.length === 0) res.status(404).json({ message: "No Item in playlist to start stream" });
-  event.emit("scheduleLive", playListData[0]);
+  const { url, _id } = playListData[0];
+  liveStream.initialise(url, _id).setupStreamListners().startStream();
   res.status(200).json({ message: "Stream has started" });
-  // const { videoUrl } = req.body;
-  // const path = join(__dirname, `/live.data/playlist.m3u8`);
-
-  // if (!videoUrl) res.status(400).json({ error: "No data passed for videoUrl" });
-  // console.log("Breaking up data..");
-  // streamingProcess = ffmpeg(videoUrl)
-  //   .inputOptions(["-re"])
-  //   .outputOptions([
-  //     "-start_number 0", // Start numbering segments at 0
-  //     "-hls_time 8", // Each segment is 10 seconds
-  //     "-hls_list_size 5", // No limit on playlist size (for VOD)
-  //     `-hls_segment_filename ${join(__dirname, `/live.data`)}/%03d.ts`, // Naming for segment files
-  //     "-hls_flags delete_segments",
-  //   ])
-  //   .on("end", async () => {
-  //     try {
-  //       const folderPath = join(__dirname, `/live.data`);
-  //       const files = await readdir(folderPath);
-
-  //       for (const file of files) {
-  //         const filePath = join(folderPath, file);
-  //         await unlink(filePath);
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //     streamingProcess = undefined;
-  //   })
-  //   .on("start", (commadline) => {
-  //     console.log(commadline);
-  //   })
-  //   .on("error", async (err) => {
-  //     console.error("Error during processing:", err.message);
-  //     const folderPath = join(__dirname, `/live.data`);
-  //     const files = await readdir(folderPath);
-  //     console.log("Deleting files in error handler");
-  //     for (const file of files) {
-  //       const filePath = join(folderPath, file);
-  //       await unlink(filePath);
-  //     }
-  //     streamingProcess = undefined;
-  //   })
-  //   .save(path);
 });
 
 export const addToPlaylistController = asyncHandler(async (req: Request, res: Response) => {
@@ -142,5 +99,8 @@ export const uploadController = asyncHandler(async (req: Request, res: Response)
 
 export const stopSteamController = asyncHandler(async (req: Request, res: Response) => {
   console.log("Stopping Streaming");
-  await stopLive(res);
+  if (await liveStream.stopStream()) res.status(200).json({ message: "Stream Stopped" });
+  else {
+    res.status(404).json({ message: "No Stream Avialable to Stop" });
+  }
 });
