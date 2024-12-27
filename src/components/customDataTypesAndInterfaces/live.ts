@@ -10,7 +10,7 @@ export interface Segment {
 }
 
 export class LiveStream {
-  private url: string = "";
+   url: string = "";
   private id: any = "";
   private streamingProcess: any = null;
   private path = join(__dirname, "..", "..", `/routes/live/live.data/playlist.m3u8`);
@@ -65,7 +65,6 @@ export class LiveStream {
         console.log(commadline);
       })
       .on("error", async (err: any) => {
-        console.log("Her############")
         await this.deleteStreamFiles();
         // await LiveSchema.deleteOne({ _id: this.id });
         // const liveDataInDatabase = await LiveSchema.find({});
@@ -89,6 +88,7 @@ export class LiveStream {
   async stopStream() {
     if (await checkPathExists(this.path)) {
       try {
+        this.url = "";
         this.streamingProcess.kill("SIGINT");
         await this.delay(20000);
         await this.deleteStreamFiles();

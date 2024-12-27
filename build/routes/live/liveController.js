@@ -23,12 +23,14 @@ const randomData_1 = require("../../components/helperMethods/randomData");
 const liveSchema_1 = require("../../schemas/liveSchema");
 exports.beginStreamController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const playListData = yield liveSchema_1.LiveSchema.find({});
-    if (yield (0, path_2.checkPathExists)((0, path_1.join)(__dirname, `/live.data/playlist.m3u8`))) {
+    if ((yield (0, path_2.checkPathExists)((0, path_1.join)(__dirname, `/live.data/playlist.m3u8`))) || objects_1.liveStream.url !== "") {
         res.status(409).json({ message: "A Video is Already been streamed" });
         return;
     }
-    else if (playListData.length === 0)
+    else if (playListData.length === 0) {
         res.status(404).json({ message: "No Item in playlist to start stream" });
+        return;
+    }
     const { url, _id } = playListData[0];
     objects_1.liveStream.initialise(url, _id).setupStreamListners().startStream();
     res.status(200).json({ message: "Stream has started" });

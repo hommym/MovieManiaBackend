@@ -14,10 +14,13 @@ import { LiveSchema } from "../../schemas/liveSchema";
 
 export const beginStreamController = asyncHandler(async (req: Request, res: Response) => {
   const playListData = await LiveSchema.find({});
-  if (await checkPathExists(join(__dirname, `/live.data/playlist.m3u8`))) {
+  if ((await checkPathExists(join(__dirname, `/live.data/playlist.m3u8`))) || liveStream.url !== "") {
     res.status(409).json({ message: "A Video is Already been streamed" });
     return;
-  } else if (playListData.length === 0) res.status(404).json({ message: "No Item in playlist to start stream" });
+  } else if (playListData.length === 0) {
+    res.status(404).json({ message: "No Item in playlist to start stream" });
+    return;
+  }
   const { url, _id } = playListData[0];
   liveStream.initialise(url, _id).setupStreamListners().startStream();
   res.status(200).json({ message: "Stream has started" });

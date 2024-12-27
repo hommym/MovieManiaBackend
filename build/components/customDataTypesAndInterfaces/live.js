@@ -77,7 +77,6 @@ class LiveStream {
             console.log(commadline);
         }))
             .on("error", (err) => __awaiter(this, void 0, void 0, function* () {
-            console.log("Her############");
             yield this.deleteStreamFiles();
             // await LiveSchema.deleteOne({ _id: this.id });
             // const liveDataInDatabase = await LiveSchema.find({});
@@ -101,6 +100,7 @@ class LiveStream {
         return __awaiter(this, void 0, void 0, function* () {
             if (yield (0, path_2.checkPathExists)(this.path)) {
                 try {
+                    this.url = "";
                     this.streamingProcess.kill("SIGINT");
                     yield this.delay(20000);
                     yield this.deleteStreamFiles();
