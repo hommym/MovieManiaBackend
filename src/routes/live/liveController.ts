@@ -107,3 +107,17 @@ export const stopSteamController = asyncHandler(async (req: Request, res: Respon
     res.status(404).json({ message: "No Stream Avialable to Stop" });
   }
 });
+
+export const addNewsController = asyncHandler(async (req: Request, res: Response) => {
+  const { news } = req.body;
+
+  if (!news) res.status(400).json({ message: "No data passed for news" });
+  else {
+    liveStream.newsData[0] = news;
+    res.status(200).json({ message: "News Updated Sucessfully" });
+  }
+});
+
+export const getNewsController= asyncHandler(async (req: Request, res: Response) => {
+  res.status(200).json({ news: liveStream.newsData[0] });
+})

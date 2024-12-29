@@ -1,9 +1,11 @@
 import { Router } from "express";
 import {
+  addNewsController,
   addToPlaylistController,
   beginStreamController,
   deletePlaylistController,
   getFileController,
+  getNewsController,
   getPlaylistController,
   getUploadedFilesController,
   stopSteamController,
@@ -21,3 +23,5 @@ liveRouter.post("/playlist", addToPlaylistController);
 liveRouter.delete("/playlist/:title", deletePlaylistController);
 liveRouter.get("/file/:fileName", getFileController);
 liveRouter.get("/uploads/:fileName", getUploadedFilesController);
+liveRouter.post("/news",addNewsController)
+liveRouter.get("/news",getNewsController)

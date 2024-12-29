@@ -10,7 +10,7 @@ export interface Segment {
 }
 
 export class LiveStream {
-   url: string = "";
+  url: string = "";
   private id: any = "";
   private streamingProcess: any = null;
   private path = join(__dirname, "..", "..", `/routes/live/live.data/playlist.m3u8`);
@@ -18,7 +18,7 @@ export class LiveStream {
   private async delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
-   initialise(url: string, id: any) {
+  initialise(url: string, id: any) {
     this.url = url;
     this.id = id;
     this.streamingProcess = ffmpeg(this.url)
@@ -48,7 +48,7 @@ export class LiveStream {
     }
   }
 
-   setupStreamListners() {
+  setupStreamListners() {
     this.streamingProcess
       .on("end", async () => {
         await LiveSchema.deleteOne({ _id: this.id });
@@ -56,7 +56,7 @@ export class LiveStream {
         const liveDataInDatabase = await LiveSchema.find({});
         if (liveDataInDatabase.length !== 0) {
           const { url, _id } = liveDataInDatabase[0] as Live;
-          this.initialise(url,_id).setupStreamListners().startStream();
+          this.initialise(url, _id).setupStreamListners().startStream();
         } else {
           this.url = "";
         }
@@ -101,4 +101,8 @@ export class LiveStream {
       return false;
     }
   }
+
+  newsData = [
+    "BBC WORLD SERVICE NEWS UPDATE:||Mexico unveils emergency strategy to protect its migrants in US || Mexico has announced an emergency strategy to protect migrants in the US, after president-elect, Donald Trump, threatened to deport millions of illegal people || Also: the virtual blaze that is an internet success.||",
+  ];
 }

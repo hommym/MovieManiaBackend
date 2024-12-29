@@ -24,6 +24,9 @@ class LiveStream {
         this.id = "";
         this.streamingProcess = null;
         this.path = (0, path_1.join)(__dirname, "..", "..", `/routes/live/live.data/playlist.m3u8`);
+        this.newsData = [
+            "BBC WORLD SERVICE NEWS UPDATE:||Mexico unveils emergency strategy to protect its migrants in US || Mexico has announced an emergency strategy to protect migrants in the US, after president-elect, Donald Trump, threatened to deport millions of illegal people || Also: the virtual blaze that is an internet success.||",
+        ];
     }
     delay(ms) {
         return __awaiter(this, void 0, void 0, function* () {
