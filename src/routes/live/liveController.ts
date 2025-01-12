@@ -121,3 +121,8 @@ export const addNewsController = asyncHandler(async (req: Request, res: Response
 export const getNewsController= asyncHandler(async (req: Request, res: Response) => {
   res.status(200).json({ news: liveStream.newsData[0] });
 })
+
+export const resetLiveController = asyncHandler(async (req: Request, res: Response) => {
+await liveStream.resetStream();
+res.status(204).end();
+});

@@ -4,6 +4,7 @@ import axios, { Axios } from "axios";
 import tough from "tough-cookie";
 import { wrapper } from "axios-cookiejar-support";
 import qs from "qs";
+import { AppError } from "../middleware/errorHandler";
 
 export class PageGetter {
   private axiosObject: Axios;
@@ -19,14 +20,14 @@ export class PageGetter {
     return response.data as string;
   };
 
-  getPagePostReq = async (pageUrl: string, moviename: string, year: string, genre:string=""): Promise<string> => {
+  getPagePostReq = async (pageUrl: string, moviename: string, year: string, genre: string = ""): Promise<string> => {
     const data = qs.stringify({
       year,
       year2: year,
       moviename,
       submit: "submit",
       category: "Hollywood",
-      genre
+      genre,
     });
     const response = await this.axiosObject.post(pageUrl, data, {
       headers: {
@@ -38,6 +39,10 @@ export class PageGetter {
 }
 
 export const getDataFromTMDB = async (url: string) => {
-  const response = await axios({ url: url, headers: { Authorization: `Bearer ${process.env.TmdbApiKey}` } });
-  return response.data;
+  try {
+    const response = await axios({ url: url, headers: { Authorization: `Bearer ${process.env.TmdbApiKey}` } });
+    return response.data;
+  } catch (error) {
+    throw new AppError("Resource Not Found", 404);
+  }
 };

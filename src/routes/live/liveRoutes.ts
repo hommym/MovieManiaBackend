@@ -8,6 +8,7 @@ import {
   getNewsController,
   getPlaylistController,
   getUploadedFilesController,
+  resetLiveController,
   stopSteamController,
   uploadController,
 } from "./liveController";
@@ -25,3 +26,4 @@ liveRouter.get("/file/:fileName", getFileController);
 liveRouter.get("/uploads/:fileName", getUploadedFilesController);
 liveRouter.post("/news",addNewsController)
 liveRouter.get("/news",getNewsController)
+liveRouter.post("/reset",resetLiveController)

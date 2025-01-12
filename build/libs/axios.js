@@ -19,6 +19,7 @@ const axios_1 = __importDefault(require("axios"));
 const tough_cookie_1 = __importDefault(require("tough-cookie"));
 const axios_cookiejar_support_1 = require("axios-cookiejar-support");
 const qs_1 = __importDefault(require("qs"));
+const errorHandler_1 = require("../middleware/errorHandler");
 class PageGetter {
     constructor() {
         this.getPage = (pageUrl) => __awaiter(this, void 0, void 0, function* () {
@@ -33,7 +34,7 @@ class PageGetter {
                 moviename,
                 submit: "submit",
                 category: "Hollywood",
-                genre
+                genre,
             });
             const response = yield this.axiosObject.post(pageUrl, data, {
                 headers: {
@@ -49,7 +50,12 @@ class PageGetter {
 }
 exports.PageGetter = PageGetter;
 const getDataFromTMDB = (url) => __awaiter(void 0, void 0, void 0, function* () {
-    const response = yield (0, axios_1.default)({ url: url, headers: { Authorization: `Bearer ${process.env.TmdbApiKey}` } });
-    return response.data;
+    try {
+        const response = yield (0, axios_1.default)({ url: url, headers: { Authorization: `Bearer ${process.env.TmdbApiKey}` } });
+        return response.data;
+    }
+    catch (error) {
+        throw new errorHandler_1.AppError("Resource Not Found", 404);
+    }
 });
 exports.getDataFromTMDB = getDataFromTMDB;

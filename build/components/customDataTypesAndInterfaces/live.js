@@ -81,16 +81,6 @@ class LiveStream {
         }))
             .on("error", (err) => __awaiter(this, void 0, void 0, function* () {
             yield this.deleteStreamFiles();
-            // await LiveSchema.deleteOne({ _id: this.id });
-            // const liveDataInDatabase = await LiveSchema.find({});
-            // if (liveDataInDatabase.length !== 0) {
-            //   const { url, _id } = liveDataInDatabase[0] as Live;
-            //   this.url = url;
-            //   this.id = _id;
-            //   this.startStream();
-            // } else {
-            //   this.url = "";
-            // }
         }));
         return this;
     }
@@ -117,6 +107,19 @@ class LiveStream {
             else {
                 return false;
             }
+        });
+    }
+    resetStream() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                this.streamingProcess.kill("SIGINT");
+            }
+            catch (error) {
+                console.log(error);
+            }
+            this.url = "";
+            yield liveSchema_1.LiveSchema.deleteMany({});
+            yield this.deleteStreamFiles();
         });
     }
 }

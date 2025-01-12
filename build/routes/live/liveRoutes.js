@@ -15,3 +15,4 @@ exports.liveRouter.get("/file/:fileName", liveController_1.getFileController);
 exports.liveRouter.get("/uploads/:fileName", liveController_1.getUploadedFilesController);
 exports.liveRouter.post("/news", liveController_1.addNewsController);
 exports.liveRouter.get("/news", liveController_1.getNewsController);
+exports.liveRouter.post("/reset", liveController_1.resetLiveController);

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNewsController = exports.addNewsController = exports.stopSteamController = exports.uploadController = exports.getUploadedFilesController = exports.getFileController = exports.getPlaylistController = exports.deletePlaylistController = exports.addToPlaylistController = exports.beginStreamController = void 0;
+exports.resetLiveController = exports.getNewsController = exports.addNewsController = exports.stopSteamController = exports.uploadController = exports.getUploadedFilesController = exports.getFileController = exports.getPlaylistController = exports.deletePlaylistController = exports.addToPlaylistController = exports.beginStreamController = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
@@ -127,4 +127,8 @@ exports.addNewsController = (0, express_async_handler_1.default)((req, res) => _
 }));
 exports.getNewsController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.status(200).json({ news: objects_1.liveStream.newsData[0] });
+}));
+exports.resetLiveController = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield objects_1.liveStream.resetStream();
+    res.status(204).end();
 }));

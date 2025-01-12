@@ -66,16 +66,6 @@ export class LiveStream {
       })
       .on("error", async (err: any) => {
         await this.deleteStreamFiles();
-        // await LiveSchema.deleteOne({ _id: this.id });
-        // const liveDataInDatabase = await LiveSchema.find({});
-        // if (liveDataInDatabase.length !== 0) {
-        //   const { url, _id } = liveDataInDatabase[0] as Live;
-        //   this.url = url;
-        //   this.id = _id;
-        //   this.startStream();
-        // } else {
-        //   this.url = "";
-        // }
       });
     return this;
   }
@@ -100,6 +90,17 @@ export class LiveStream {
     } else {
       return false;
     }
+  }
+
+  async resetStream() {
+    try {
+      this.streamingProcess.kill("SIGINT");
+    } catch (error) {
+      console.log(error);
+    }
+    this.url = "";
+    await LiveSchema.deleteMany({});
+    await this.deleteStreamFiles();
   }
 
   newsData = [
